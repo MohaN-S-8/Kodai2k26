@@ -45,10 +45,13 @@ export const MONEY_COLUMNS = new Set([
 ]);
 
 export const PREFERRED_COLUMNS = [
-  "No",
   "Name",
   "Total Share",
   "Total given",
   "Entry fee ~ 500",
   BALANCE_COLUMN,
 ];
+
+
+
+

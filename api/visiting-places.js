@@ -126,28 +126,17 @@ function placesToRows(places) {
   return places.map(cleanPlace).filter((place) => place.id && place.name).map((place) => [place.id, place.name, place.cost, place.note, place.visited ? "TRUE" : "FALSE", place.custom ? "TRUE" : "FALSE"]);
 }
 
-function mergeDefaults(places) {
-  const merged = [...places];
-
-  DEFAULT_PLACES.forEach((defaultPlace) => {
-    if (!merged.some((place) => place.id === defaultPlace.id)) {
-      merged.push(defaultPlace);
-    }
-  });
-
-  return merged;
-}
-
 async function readFromSheetsApi() {
   const sheetTitle = await getSheetTitle();
   const range = `${quoteSheetName(sheetTitle)}!A:F`;
   const data = await sheetsRequest(`/values/${encodeURIComponent(range)}`);
   const values = data.values || [];
   const hasHeaders = HEADERS.every((header, index) => values[0]?.[index] === header);
-  const places = mergeDefaults(rowsToPlaces(hasHeaders ? values.slice(1) : values));
+  const places = rowsToPlaces(hasHeaders ? values.slice(1) : values);
 
-  if (!hasHeaders || values.length <= 1) {
-    await writePlacesToSheetsApi(places);
+  if (!hasHeaders || values.length <= 1 || places.length === 0) {
+    await writePlacesToSheetsApi(DEFAULT_PLACES);
+    return { places: DEFAULT_PLACES };
   }
 
   return { places };
@@ -156,7 +145,7 @@ async function readFromSheetsApi() {
 async function writePlacesToSheetsApi(places) {
   const sheetTitle = await getSheetTitle();
   const range = `${quoteSheetName(sheetTitle)}!A:F`;
-  const rows = placesToRows(mergeDefaults(places));
+  const rows = placesToRows(places);
 
   await sheetsRequest(`/values/${encodeURIComponent(range)}:clear`, { method: "POST", body: JSON.stringify({}) });
   await sheetsRequest(`/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`, { method: "PUT", body: JSON.stringify({ values: [HEADERS, ...rows] }) });
@@ -167,7 +156,7 @@ async function writePlacesToSheetsApi(places) {
 function parseCsv(csvText) {
   const rows = csvText.split(/\r?\n/).map((line) => line.split(",").map((cell) => cell.trim())).filter((row) => row.some(Boolean));
   const hasHeaders = HEADERS.every((header, index) => rows[0]?.[index] === header);
-  return { places: mergeDefaults(rowsToPlaces(hasHeaders ? rows.slice(1) : rows)) };
+  return { places: rowsToPlaces(hasHeaders ? rows.slice(1) : rows) };
 }
 
 async function readFromCsv() {
@@ -236,6 +225,8 @@ export default async function handler(request, response) {
     response.status(error.statusCode || 500).json({ error: error.message || "Visiting places request failed" });
   }
 }
+
+
 
 
 

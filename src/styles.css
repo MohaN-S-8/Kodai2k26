@@ -686,7 +686,7 @@ h2 {
   box-shadow: 0 12px 36px rgba(18, 25, 38, 0.06);
 }
 
-.visiting-place:has(.delete-place-button) {
+.visiting-place:has(.place-actions) {
   grid-template-columns: 24px 1fr auto;
 }
 
@@ -1270,3 +1270,5 @@ tbody tr.is-paid td {
     min-width: 760px;
   }
 }
+
+

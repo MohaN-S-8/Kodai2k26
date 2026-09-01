@@ -51,6 +51,7 @@ function VisitingPlacesPanel({ onClose, onToast }) {
   const [editorPin, setEditorPin] = useState("");
   const [isPinUnlocked, setIsPinUnlocked] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [editingPlaceId, setEditingPlaceId] = useState(null);
   const [placeName, setPlaceName] = useState("");
   const [placeCost, setPlaceCost] = useState("Under Rs 500");
   const [placeNote, setPlaceNote] = useState("");
@@ -99,6 +100,7 @@ function VisitingPlacesPanel({ onClose, onToast }) {
     () => places.filter((place) => place.visited).length,
     [places]
   );
+  const isEditing = Boolean(editingPlaceId);
 
   async function syncPlaces(nextPlaces, successMessage) {
     setPlaces(nextPlaces);
@@ -119,6 +121,13 @@ function VisitingPlacesPanel({ onClose, onToast }) {
     }
   }
 
+  function resetPlaceForm() {
+    setEditingPlaceId(null);
+    setPlaceName("");
+    setPlaceCost("Under Rs 500");
+    setPlaceNote("");
+  }
+
   function handlePinSubmit(event) {
     event.preventDefault();
 
@@ -135,7 +144,22 @@ function VisitingPlacesPanel({ onClose, onToast }) {
     onToast("success", "Visiting places update access unlocked");
   }
 
-  function handleAddPlace(event) {
+  function handleEditPlace(place, event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!isPinUnlocked) {
+      onToast("error", "Enter Trip PIN to edit places");
+      return;
+    }
+
+    setEditingPlaceId(place.id);
+    setPlaceName(place.name);
+    setPlaceCost(place.cost || "Under Rs 500");
+    setPlaceNote(place.note || "");
+  }
+
+  function handleSavePlace(event) {
     event.preventDefault();
 
     const name = placeName.trim();
@@ -143,7 +167,7 @@ function VisitingPlacesPanel({ onClose, onToast }) {
     const note = placeNote.trim() || "Custom stop added by the trip editor.";
 
     if (!isPinUnlocked) {
-      onToast("error", "Enter Trip PIN to add places");
+      onToast("error", "Enter Trip PIN to save places");
       return;
     }
 
@@ -152,8 +176,17 @@ function VisitingPlacesPanel({ onClose, onToast }) {
       return;
     }
 
-    if (places.some((place) => place.name.toLowerCase() === name.toLowerCase())) {
+    if (places.some((place) => place.id !== editingPlaceId && place.name.toLowerCase() === name.toLowerCase())) {
       onToast("error", `${name} is already in the list`);
+      return;
+    }
+
+    if (editingPlaceId) {
+      const nextPlaces = places.map((place) =>
+        place.id === editingPlaceId ? { ...place, name, cost, note } : place,
+      );
+      resetPlaceForm();
+      syncPlaces(nextPlaces, `${name} updated`);
       return;
     }
 
@@ -169,9 +202,7 @@ function VisitingPlacesPanel({ onClose, onToast }) {
       },
     ];
 
-    setPlaceName("");
-    setPlaceCost("Under Rs 500");
-    setPlaceNote("");
+    resetPlaceForm();
     syncPlaces(nextPlaces, `${name} added to visiting places`);
   }
 
@@ -199,9 +230,8 @@ function VisitingPlacesPanel({ onClose, onToast }) {
       return;
     }
 
-    if (!place.custom) {
-      onToast("error", "Default places cannot be deleted");
-      return;
+    if (editingPlaceId === place.id) {
+      resetPlaceForm();
     }
 
     syncPlaces(
@@ -266,7 +296,7 @@ function VisitingPlacesPanel({ onClose, onToast }) {
       )}
 
       {isPinUnlocked && (
-        <form className="add-place-form" onSubmit={handleAddPlace}>
+        <form className="add-place-form" onSubmit={handleSavePlace}>
           <label>
             Place name
             <input
@@ -295,8 +325,13 @@ function VisitingPlacesPanel({ onClose, onToast }) {
             />
           </label>
           <button type="submit" disabled={!placeName.trim() || isSyncing}>
-            Add place
+            {isEditing ? "Save place" : "Add place"}
           </button>
+          {isEditing && (
+            <button className="cancel-edit-button" type="button" onClick={resetPlaceForm}>
+              Cancel
+            </button>
+          )}
         </form>
       )}
 
@@ -318,15 +353,25 @@ function VisitingPlacesPanel({ onClose, onToast }) {
               <em>{place.cost}</em>
               <small>{place.note}</small>
             </span>
-            {isPinUnlocked && place.custom && (
-              <button
-                className="delete-place-button"
-                type="button"
-                aria-label={`Delete ${place.name}`}
-                onClick={(event) => handleDeletePlace(place, event)}
-              >
-                Delete
-              </button>
+            {isPinUnlocked && (
+              <span className="place-actions">
+                <button
+                  className="edit-place-button"
+                  type="button"
+                  aria-label={`Edit ${place.name}`}
+                  onClick={(event) => handleEditPlace(place, event)}
+                >
+                  Edit
+                </button>
+                <button
+                  className="delete-place-button"
+                  type="button"
+                  aria-label={`Delete ${place.name}`}
+                  onClick={(event) => handleDeletePlace(place, event)}
+                >
+                  Delete
+                </button>
+              </span>
             )}
           </label>
         ))}
@@ -336,5 +381,3 @@ function VisitingPlacesPanel({ onClose, onToast }) {
 }
 
 export default VisitingPlacesPanel;
-
-

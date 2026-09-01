@@ -118,6 +118,8 @@ function ExpensePanel({
   onClose,
   onUpdatePayment,
 }) {
+  const visibleColumns = displayColumns.filter((column) => column !== "No");
+
   return (
     <>
       <PaymentCard
@@ -160,7 +162,7 @@ function ExpensePanel({
           <table>
             <thead>
               <tr>
-                {displayColumns.map((column) => (
+                {visibleColumns.map((column) => (
                   <th key={column}>{COLUMN_LABELS[column] || column}</th>
                 ))}
               </tr>
@@ -171,7 +173,7 @@ function ExpensePanel({
                   className={isFullyPaid(row) ? "is-paid" : ""}
                   key={`${row.No}-${row.Name}-${rowIndex}`}
                 >
-                  {displayColumns.map((column) => (
+                  {visibleColumns.map((column) => (
                     <td
                       className={MONEY_COLUMNS.has(column) ? "money" : ""}
                       key={column}
@@ -192,4 +194,6 @@ function ExpensePanel({
 }
 
 export default ExpensePanel;
+
+
 

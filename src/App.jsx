@@ -56,7 +56,14 @@ function App() {
   }, []);
 
   const memberRows = useMemo(
-    () => rows.filter((row) => isNumber(row.No) && row.Name),
+    () =>
+      rows
+        .filter((row) => isNumber(row.No) && row.Name)
+        .sort((firstRow, secondRow) =>
+          firstRow.Name.localeCompare(secondRow.Name, undefined, {
+            sensitivity: "base",
+          })
+        ),
     [rows]
   );
 
@@ -245,6 +252,7 @@ function App() {
 }
 
 export default App;
+
 
 
 

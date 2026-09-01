@@ -41,9 +41,9 @@ function TravelRoute() {
       <div className="route-road" aria-hidden="true">
         <div className="route-dashes" />
         <div className="route-rider-pack">
-          <img className="route-rider" src="/images/trip-rider.png" alt="" />
+          <img className="route-rider" src="/images/trip-rider.png" alt="" loading="lazy" decoding="async" />
           <p>tour na enaku nee than vathiyare...</p>
-          <img className="route-van" src="/images/route-van.svg" alt="" />
+          <img className="route-van" src="/images/route-van.svg" alt="" loading="lazy" decoding="async" />
         </div>
       </div>
     </section>
@@ -51,7 +51,3 @@ function TravelRoute() {
 }
 
 export default TravelRoute;
-
-
-
-

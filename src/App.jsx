@@ -17,7 +17,6 @@ const SHEET_REFRESH_INTERVAL_MS = Math.max(
   Number(import.meta.env.VITE_SHEET_REFRESH_INTERVAL_MS || 15000),
   5000,
 );
-
 function App() {
   const [columns, setColumns] = useState([]);
   const [rows, setRows] = useState([]);
@@ -193,65 +192,76 @@ function App() {
   }
 
   return (
-    <main className="page-shell">
-      <Header
-        peopleCount={memberRows.length}
-        totalBalance={totalBalance}
-        onHome={returnHome}
-      />
+    <main className="app-shell">
+      <section className="trip-bg-band trip-bg-route">
+        <div className="page-shell">
+          <Header
+            peopleCount={memberRows.length}
+            totalBalance={totalBalance}
+            onHome={returnHome}
+          />
+
+          {status === "ready" && rows.length > 0 && <TravelRoute />}
+
+          {status === "loading" && (
+            <section className="state-panel">
+              <div className="loader" aria-hidden="true" />
+              <p>Fetching the trip secrets from Google Sheets...</p>
+            </section>
+          )}
+
+          {status === "error" && (
+            <section className="state-panel error">
+              <h2>Sheet could not load</h2>
+              <p>{error}</p>
+            </section>
+          )}
+
+          {status === "ready" && rows.length === 0 && (
+            <section className="state-panel">
+              <p>The sheet loaded, but there are no data rows yet.</p>
+            </section>
+          )}
+        </div>
+      </section>
 
       {status === "ready" && rows.length > 0 && (
-        <>
-          <TravelRoute />
-          <TripMap />
-        </>
+        <section className="trip-bg-band trip-bg-stay">
+          <div className="page-shell">
+            <TripMap />
+          </div>
+        </section>
       )}
 
       {status === "ready" && rows.length > 0 && (
-        <ActionMenu
-          activeView={activeView}
-          onOpenExpenses={openExpenseNamePrompt}
-          onOpenVisiting={openVisitingPlaces}
-        />
-      )}
+        <section className="trip-bg-band trip-bg-details">
+          <div className="page-shell">
+            <ActionMenu
+              activeView={activeView}
+              onOpenExpenses={openExpenseNamePrompt}
+              onOpenVisiting={openVisitingPlaces}
+            />
 
-      {status === "loading" && (
-        <section className="state-panel">
-          <div className="loader" aria-hidden="true" />
-          <p>Fetching the trip secrets from Google Sheets...</p>
+            {activeView === "expenses" && (
+              <ExpensePanel
+                displayColumns={displayColumns}
+                memberRows={memberRows}
+                selectedMember={selectedMember}
+                onClose={returnHome}
+                onUpdatePayment={handlePaymentUpdate}
+                isUpdatingPayment={isUpdatingPayment}
+                paymentUpdateError={paymentUpdateError}
+              />
+            )}
+
+            {activeView === "visiting" && (
+              <VisitingPlacesPanel
+                onClose={returnHome}
+                onToast={showToast}
+              />
+            )}
+          </div>
         </section>
-      )}
-
-      {status === "error" && (
-        <section className="state-panel error">
-          <h2>Sheet could not load</h2>
-          <p>{error}</p>
-        </section>
-      )}
-
-      {status === "ready" && rows.length === 0 && (
-        <section className="state-panel">
-          <p>The sheet loaded, but there are no data rows yet.</p>
-        </section>
-      )}
-
-      {status === "ready" && rows.length > 0 && activeView === "expenses" && (
-        <ExpensePanel
-          displayColumns={displayColumns}
-          memberRows={memberRows}
-          selectedMember={selectedMember}
-          onClose={returnHome}
-          onUpdatePayment={handlePaymentUpdate}
-          isUpdatingPayment={isUpdatingPayment}
-          paymentUpdateError={paymentUpdateError}
-        />
-      )}
-
-      {status === "ready" && rows.length > 0 && activeView === "visiting" && (
-        <VisitingPlacesPanel
-          onClose={returnHome}
-          onToast={showToast}
-        />
       )}
 
       <Toast toast={toast} onClose={() => setToast(null)} />
@@ -272,10 +282,6 @@ function App() {
 }
 
 export default App;
-
-
-
-
 
 
 

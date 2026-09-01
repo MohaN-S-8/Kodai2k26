@@ -38,11 +38,11 @@ function TripLoader({ onFinish }) {
       className={`intro-loader ${hasStarted ? "is-started" : ""}`}
       aria-label="Trip loading screen"
     >
-      <audio ref={audioRef} src="/sounds/loading.ogg" preload="auto" />
+      <audio ref={audioRef} src="/sounds/loading.ogg" preload="none" />
       <div className="road-line" />
       <div className="rider-track">
         <div className="rider-pack">
-          <img src="/images/trip-rider.png" alt="Bike rider loading" />
+          <img src="/images/trip-rider.png" alt="Bike rider loading" decoding="async" fetchPriority="high" />
           <p>tour na enaku nee than vathiyare...</p>
         </div>
       </div>
@@ -57,4 +57,3 @@ function TripLoader({ onFinish }) {
 }
 
 export default TripLoader;
-

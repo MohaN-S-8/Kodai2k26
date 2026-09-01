@@ -269,7 +269,7 @@ function App() {
       {promptTarget && (
         <NamePromptModal
           error={nameError}
-          eyebrow="Verify enemy"
+          eyebrow="Verify urself"
           names={promptNames}
           submitLabel="Show Balance"
           title="Select your name"

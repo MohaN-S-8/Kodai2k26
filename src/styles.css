@@ -437,8 +437,8 @@ tbody tr:hover {
   min-width: 156px;
   border: 0;
   border-radius: 999px;
-  background: #ffffff;
-  color: #111827;
+  background: #111827;
+  color: #ffffff;
   cursor: pointer;
   padding: 14px 22px;
   font-size: 1rem;
@@ -597,4 +597,127 @@ tbody tr:hover {
 
 
 
+
+
+.payment-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+  border: 1px solid #dce2ea;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 18px;
+  box-shadow: 0 18px 60px rgba(18, 25, 38, 0.08);
+}
+
+.payment-card h2 {
+  margin-bottom: 8px;
+}
+
+.payment-card span {
+  color: #273244;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.payment-button,
+.modal-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #111827;
+  border-radius: 8px;
+  background: #111827;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 12px 16px;
+  font-weight: 900;
+  text-align: center;
+  text-decoration: none;
+}
+
+.payment-button:hover,
+.payment-button:focus-visible,
+.modal-actions button:hover,
+.modal-actions button:focus-visible {
+  background: #0d7c66;
+  border-color: #0d7c66;
+  color: #ffffff;
+  outline: none;
+}
+
+.payment-note {
+  max-width: 360px;
+  margin: 0;
+  color: #b42318;
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  background: rgba(17, 24, 39, 0.52);
+  padding: 20px;
+}
+
+.name-modal {
+  width: min(100%, 440px);
+  border: 1px solid #dce2ea;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 20px;
+  box-shadow: 0 24px 90px rgba(17, 24, 39, 0.28);
+}
+
+.name-modal input {
+  width: 100%;
+  margin-top: 18px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 13px 14px;
+  color: #111827;
+  font-weight: 800;
+}
+
+.name-modal input:focus {
+  border-color: #0d7c66;
+  outline: 3px solid rgba(13, 124, 102, 0.18);
+}
+
+.modal-error {
+  margin: 10px 0 0;
+  color: #b42318;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+@media (max-width: 720px) {
+  .payment-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .payment-button,
+  .modal-actions button {
+    width: 100%;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+}
 

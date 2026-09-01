@@ -1,133 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import ActionMenu from "./components/ActionMenu";
+import ExpensePanel from "./components/ExpensePanel";
+import Header from "./components/Header";
+import NamePromptModal from "./components/NamePromptModal";
+import TripLoader from "./components/TripLoader";
+import TripMap from "./components/TripMap";
+import { BALANCE_COLUMN, PREFERRED_COLUMNS } from "./data/tripConfig";
 import { fetchTripSheetData } from "./lib/googleSheet";
-
-const COMMON_COSTS = [
-  {
-    label: "Van Total",
-    value: "46000",
-    note: "Common trip van amount",
-  },
-  {
-    label: "Room Total",
-    value: "11000",
-    note: "Common stay amount",
-  },
-  {
-    label: "Camera Total",
-    value: "1950",
-    note: "Already added to whoever pays it",
-  },
-  {
-    label: "Food",
-    value: "~1500",
-    note: "Per person for 2 days",
-  },
-  {
-    label: "Entry Fee",
-    value: "~500",
-    note: "Per person",
-  },
-];
-
-const COLUMN_LABELS = {
-  No: "No",
-  Name: "Name",
-  "Total Share": "Total Share",
-  "Total given": "Total Given",
-  "Entry fee ~ 500": "Entry Fee ~ 500",
-  "Balance Amount From per Person Without food": "Balance Without Food",
-};
-
-const MONEY_COLUMNS = new Set([
-  "Total Share",
-  "Total given",
-  "Entry fee ~ 500",
-  "Balance Amount From per Person Without food",
-]);
-
-function isNumber(value) {
-  return /^\d+$/.test(String(value || "").trim());
-}
-
-function formatMoney(value) {
-  const number = Number(String(value || "").replace(/,/g, ""));
-
-  if (!Number.isFinite(number)) {
-    return value || "-";
-  }
-
-  return new Intl.NumberFormat("en-IN", {
-    maximumFractionDigits: 0,
-  }).format(number);
-}
-
-function TripLoader({ onFinish }) {
-  const audioRef = useRef(null);
-  const [hasStarted, setHasStarted] = useState(false);
-
-  useEffect(() => {
-    if (!hasStarted) {
-      return undefined;
-    }
-
-    const timer = window.setTimeout(onFinish, 6500);
-
-    return () => window.clearTimeout(timer);
-  }, [hasStarted, onFinish]);
-
-  async function startTrip() {
-    const audio = audioRef.current;
-
-    setHasStarted(true);
-
-    if (!audio) {
-      return;
-    }
-
-    audio.volume = 0.75;
-    audio.currentTime = 0;
-
-    try {
-      await audio.play();
-    } catch {
-      // The animation still runs if a browser or device blocks audio.
-    }
-  }
-
-  return (
-    <section
-      className={`intro-loader ${hasStarted ? "is-started" : ""}`}
-      aria-label="Trip loading screen"
-    >
-      <audio ref={audioRef} src="/sounds/loading.ogg" preload="auto" />
-      <div className="road-line" />
-      <div className="rider-track">
-        <div className="rider-pack">
-          <img src="/images/trip-rider.png" alt="Bike rider loading" />
-          <p>Tour na enaku nee than vathiyare...</p>
-        </div>
-      </div>
-
-      {!hasStarted && (
-        <button className="start-trip-button" type="button" onClick={startTrip}>
-          Start Trip
-        </button>
-      )}
-    </section>
-  );
-}
-function TripMap() {
-  return (
-    <section className="map-panel" aria-label="Kodai trip map">
-      <iframe
-        title="Kodaikanal trip map"
-        src="https://www.google.com/maps?q=Kodaikanal,Tamil%20Nadu&output=embed"
-        loading="lazy"
-        referrerPolicy="no-referrer-when-downgrade"
-      />
-    </section>
-  );
-}
+import { findMemberByName, isNumber } from "./utils/names";
+import { getMoneyNumber } from "./utils/money";
 
 function App() {
   const [columns, setColumns] = useState([]);
@@ -136,6 +17,9 @@ function App() {
   const [error, setError] = useState("");
   const [activeView, setActiveView] = useState("home");
   const [showIntro, setShowIntro] = useState(true);
+  const [isNamePromptOpen, setIsNamePromptOpen] = useState(false);
+  const [nameError, setNameError] = useState("");
+  const [selectedMember, setSelectedMember] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -167,21 +51,12 @@ function App() {
 
   const memberRows = useMemo(
     () => rows.filter((row) => isNumber(row.No) && row.Name),
-    [rows],
+    [rows]
   );
 
   const displayColumns = useMemo(() => {
-    const preferredColumns = [
-      "No",
-      "Name",
-      "Total Share",
-      "Total given",
-      "Entry fee ~ 500",
-      "Balance Amount From per Person Without food",
-    ];
-
-    const availablePreferred = preferredColumns.filter((column) =>
-      columns.includes(column),
+    const availablePreferred = PREFERRED_COLUMNS.filter((column) =>
+      columns.includes(column)
     );
 
     return availablePreferred.length > 0 ? availablePreferred : columns;
@@ -190,17 +65,36 @@ function App() {
   const totalBalance = useMemo(
     () =>
       memberRows.reduce(
-        (total, row) =>
-          total +
-          Number(
-            String(
-              row["Balance Amount From per Person Without food"] || 0,
-            ).replace(/,/g, ""),
-          ),
-        0,
+        (total, row) => total + getMoneyNumber(row[BALANCE_COLUMN]),
+        0
       ),
-    [memberRows],
+    [memberRows]
   );
+
+  function returnHome() {
+    setActiveView("home");
+    setSelectedMember(null);
+    setNameError("");
+  }
+
+  function openExpenseNamePrompt() {
+    setNameError("");
+    setIsNamePromptOpen(true);
+  }
+
+  function handleNameSubmit(name) {
+    const matchedMember = findMemberByName(memberRows, name);
+
+    if (!matchedMember) {
+      setNameError("Name not found in the trip sheet. Try the same spelling from the sheet.");
+      return;
+    }
+
+    setSelectedMember(matchedMember);
+    setActiveView("expenses");
+    setIsNamePromptOpen(false);
+    setNameError("");
+  }
 
   if (showIntro) {
     return <TripLoader onFinish={() => setShowIntro(false)} />;
@@ -208,30 +102,19 @@ function App() {
 
   return (
     <main className="page-shell">
-      <section className="top-bar">
-        <div>
-          <p className="eyebrow">Kodai trip </p>
-          {/* <h1>Trip Balance Table</h1> */}
-        </div>
-        <div className="stats">
-          <span>{memberRows.length} people</span>
-          <span>Rs {formatMoney(totalBalance)} balance</span>
-          {/* <span>{displayColumns.length} columns</span> */}
-        </div>
-      </section>
+      <Header
+        peopleCount={memberRows.length}
+        totalBalance={totalBalance}
+        onHome={returnHome}
+      />
 
       {status === "ready" && rows.length > 0 && <TripMap />}
 
       {status === "ready" && rows.length > 0 && (
-        <section className="action-strip" aria-label="Trip actions">
-          <button
-            className={`menu-option ${activeView === "expenses" ? "is-active" : ""}`}
-            type="button"
-            onClick={() => setActiveView("expenses")}
-          >
-            Overall Cost & Expense
-          </button>
-        </section>
+        <ActionMenu
+          isActive={activeView === "expenses"}
+          onOpenExpenses={openExpenseNamePrompt}
+        />
       )}
 
       {status === "loading" && (
@@ -255,65 +138,20 @@ function App() {
       )}
 
       {status === "ready" && rows.length > 0 && activeView === "expenses" && (
-        <>
-          <section className="summary-grid" aria-label="Common trip costs">
-            {COMMON_COSTS.map((cost) => (
-              <article className="summary-card" key={cost.label}>
-                <p>{cost.label}</p>
-                <strong>Rs {cost.value}</strong>
-                <span>{cost.note}</span>
-              </article>
-            ))}
-          </section>
+        <ExpensePanel
+          displayColumns={displayColumns}
+          memberRows={memberRows}
+          selectedMember={selectedMember}
+          onClose={returnHome}
+        />
+      )}
 
-          <section className="table-panel" aria-label="Google Sheet data">
-            <div className="table-heading">
-              <div>
-                {/* <p className="eyebrow">Live from Google Sheet</p> */}
-                <h2>Payment Status</h2>
-              </div>
-              <div className="table-actions">
-                <span>{memberRows.length} people listed</span>
-                <button
-                  className="close-panel-button"
-                  type="button"
-                  aria-label="Close overall cost and expense"
-                  onClick={() => setActiveView("home")}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-
-            <div className="table-scroll">
-              <table>
-                <thead>
-                  <tr>
-                    {displayColumns.map((column) => (
-                      <th key={column}>{COLUMN_LABELS[column] || column}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {memberRows.map((row, rowIndex) => (
-                    <tr key={`${row.No}-${row.Name}-${rowIndex}`}>
-                      {displayColumns.map((column) => (
-                        <td
-                          className={MONEY_COLUMNS.has(column) ? "money" : ""}
-                          key={column}
-                        >
-                          {MONEY_COLUMNS.has(column)
-                            ? formatMoney(row[column])
-                            : row[column] || "-"}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        </>
+      {isNamePromptOpen && (
+        <NamePromptModal
+          error={nameError}
+          onClose={() => setIsNamePromptOpen(false)}
+          onSubmit={handleNameSubmit}
+        />
       )}
     </main>
   );

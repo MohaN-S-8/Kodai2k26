@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ActionMenu from "./components/ActionMenu";
 import ExpensePanel from "./components/ExpensePanel";
 import Header from "./components/Header";
@@ -13,6 +13,11 @@ import { fetchTripSheetData, updateTripPayment } from "./lib/googleSheet";
 import { findMemberByName, isNumber } from "./utils/names";
 import { getMoneyNumber } from "./utils/money";
 
+const SHEET_REFRESH_INTERVAL_MS = Math.max(
+  Number(import.meta.env.VITE_SHEET_REFRESH_INTERVAL_MS || 15000),
+  5000,
+);
+
 function App() {
   const [columns, setColumns] = useState([]);
   const [rows, setRows] = useState([]);
@@ -26,22 +31,42 @@ function App() {
   const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
   const [paymentUpdateError, setPaymentUpdateError] = useState("");
   const [toast, setToast] = useState(null);
+  const selectedMemberNameRef = useRef("");
+
+  const applySheetData = useCallback((data, currentMemberName = selectedMemberNameRef.current) => {
+    const nextRows = data.rows;
+    const nextMemberRows = nextRows.filter((row) => isNumber(row.No) && row.Name);
+
+    setColumns(data.columns);
+    setRows(nextRows);
+
+    if (currentMemberName) {
+      setSelectedMember(findMemberByName(nextMemberRows, currentMemberName));
+    }
+  }, []);
+
+  useEffect(() => {
+    selectedMemberNameRef.current = selectedMember?.Name || "";
+  }, [selectedMember]);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function loadSheet() {
+    async function loadSheet({ silent = false } = {}) {
       try {
-        setStatus("loading");
+        if (!silent) {
+          setStatus("loading");
+        }
+
         const data = await fetchTripSheetData();
 
         if (!cancelled) {
-          setColumns(data.columns);
-          setRows(data.rows);
+          applySheetData(data);
+          setError("");
           setStatus("ready");
         }
       } catch (sheetError) {
-        if (!cancelled) {
+        if (!cancelled && !silent) {
           setError(sheetError.message);
           setStatus("error");
         }
@@ -49,11 +74,17 @@ function App() {
     }
 
     loadSheet();
+    const refreshTimer = window.setInterval(() => {
+      if (document.visibilityState !== "hidden") {
+        loadSheet({ silent: true });
+      }
+    }, SHEET_REFRESH_INTERVAL_MS);
 
     return () => {
       cancelled = true;
+      window.clearInterval(refreshTimer);
     };
-  }, []);
+  }, [applySheetData]);
 
   const memberRows = useMemo(
     () =>
@@ -88,10 +119,10 @@ function App() {
     [memberRows]
   );
 
-  function showToast(type, message) {
+  const showToast = useCallback((type, message) => {
     setToast({ type, message });
     window.setTimeout(() => setToast(null), 3200);
-  }
+  }, []);
 
   function returnHome() {
     setActiveView("home");
@@ -117,17 +148,6 @@ function App() {
     setPromptTarget(null);
   }
 
-  function applySheetData(data, currentMemberName = selectedMember?.Name) {
-    const nextRows = data.rows;
-    const nextMemberRows = nextRows.filter((row) => isNumber(row.No) && row.Name);
-
-    setColumns(data.columns);
-    setRows(nextRows);
-
-    if (currentMemberName) {
-      setSelectedMember(findMemberByName(nextMemberRows, currentMemberName));
-    }
-  }
 
   async function handlePaymentUpdate({ name, totalGiven, pin }) {
     const targetName = name || selectedMember?.Name;
@@ -252,6 +272,10 @@ function App() {
 }
 
 export default App;
+
+
+
+
 
 
 

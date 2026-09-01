@@ -49,7 +49,7 @@ function TripLoader({ onFinish }) {
 
       {!hasStarted && (
         <button className="start-trip-button" type="button" onClick={startTour}>
-          Start Tour
+          Let's Roll !...
         </button>
       )}
     </section>

@@ -1,18 +1,19 @@
 :root {
   color: #18202f;
   background: #f7f8fb;
-  font-family: Inter;
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
 
 html {
   overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
 }
 
 * {
   box-sizing: border-box;
-  font-family: Inter;
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
 }
 
 body {
@@ -20,13 +21,14 @@ body {
   min-width: 320px;
   min-height: 100vh;
   overflow-x: hidden;
+  background: #f7f8fb;
 }
 
 button,
 input,
 textarea,
 select {
-  font: Inter;
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
 }
 
 .page-shell {
@@ -384,6 +386,8 @@ h2 {
   font-size: clamp(1rem, 2.6vw, 2.2rem);
   font-weight: 900;
   line-height: 1;
+  max-width: min(44vw, 620px);
+  overflow-wrap: anywhere;
   white-space: nowrap;
 }
 
@@ -688,6 +692,43 @@ h2 {
 
 .visiting-place:has(.place-actions) {
   grid-template-columns: 24px 1fr auto;
+}
+
+.place-actions {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 82px;
+}
+
+.edit-place-button,
+.delete-place-button,
+.cancel-edit-button {
+  border: 1px solid #111827;
+  border-radius: 8px;
+  background: #111827;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 10px 12px;
+  font-size: 0.82rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.edit-place-button:hover,
+.edit-place-button:focus-visible,
+.cancel-edit-button:hover,
+.cancel-edit-button:focus-visible {
+  background: #210f37;
+  border-color: #210f37;
+  outline: none;
+}
+
+.delete-place-button:hover,
+.delete-place-button:focus-visible {
+  background: #b42318;
+  border-color: #b42318;
+  outline: none;
 }
 
 .visiting-place input {
@@ -1030,6 +1071,8 @@ tbody tr.is-paid td {
   font-weight: 900;
   line-height: 1;
   letter-spacing: 0;
+  max-width: min(48vw, 820px);
+  overflow-wrap: anywhere;
   text-shadow: 0 4px 0 rgba(255, 255, 255, 0.75);
   white-space: nowrap;
 }
@@ -1270,5 +1313,234 @@ tbody tr.is-paid td {
     min-width: 760px;
   }
 }
+
+
+
+
+@media (min-width: 901px) {
+  .visiting-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 721px) and (max-width: 900px) {
+  .visiting-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .add-place-form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .add-place-form label:nth-child(3),
+  .add-place-form button,
+  .add-place-form .cancel-edit-button {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 720px) {
+  .brand-home strong,
+  h1 {
+    font-size: clamp(1.8rem, 12vw, 3rem);
+    line-height: 1;
+  }
+
+  .route-preview {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    min-height: auto;
+    padding: 14px;
+  }
+
+  .route-point {
+    width: 100%;
+    min-height: 92px;
+    padding: 14px;
+  }
+
+  .route-point strong {
+    font-size: clamp(1.2rem, 8vw, 1.7rem);
+  }
+
+  .route-line {
+    width: 8px;
+    height: 62px;
+    justify-self: center;
+    background: repeating-linear-gradient(
+      180deg,
+      #111827 0 18px,
+      transparent 18px 32px
+    );
+  }
+
+  .route-line span {
+    left: 50%;
+  }
+
+  .route-line span:nth-child(1) {
+    top: 15%;
+  }
+
+  .route-line span:nth-child(2) {
+    top: 50%;
+  }
+
+  .route-line span:nth-child(3) {
+    top: 85%;
+  }
+
+  .visiting-access-card,
+  .visiting-pin-form,
+  .add-place-form {
+    margin-left: 12px;
+    margin-right: 12px;
+  }
+
+  .visiting-access-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .visiting-pin-form,
+  .add-place-form {
+    grid-template-columns: 1fr;
+  }
+
+  .visiting-pin-form button,
+  .add-place-form button,
+  .cancel-edit-button {
+    width: 100%;
+  }
+
+  .visiting-grid {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .visiting-place,
+  .visiting-place:has(.place-actions) {
+    grid-template-columns: 24px minmax(0, 1fr);
+    min-height: auto;
+    padding: 14px;
+  }
+
+  .place-actions {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-width: 0;
+  }
+
+  .edit-place-button,
+  .delete-place-button {
+    width: 100%;
+  }
+
+  .visit-copy,
+  .visit-copy strong,
+  .visit-copy small {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 520px) {
+  .route-heading,
+  .table-heading,
+  .stay-card,
+  .payment-card {
+    padding: 14px;
+  }
+
+  .route-road {
+    height: 116px;
+  }
+
+  .route-rider-pack {
+    gap: 4px;
+  }
+
+  .route-rider {
+    max-width: min(180px, 48vw);
+    max-height: 92px;
+  }
+
+  .route-van {
+    width: min(94px, 27vw);
+    margin-bottom: 12px;
+  }
+
+  .route-rider-pack p {
+    max-width: 42vw;
+    margin-bottom: 16px;
+    font-size: clamp(0.82rem, 4.2vw, 1.05rem);
+    line-height: 1.1;
+  }
+
+  .table-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .modal-backdrop {
+    padding: 12px;
+  }
+
+  .name-modal {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 420px) {
+  .page-shell {
+    width: calc(100% - 16px);
+    padding: 16px 0;
+  }
+
+  .route-preview {
+    padding: 10px;
+  }
+
+  .map-panel {
+    height: min(360px, 48vh);
+  }
+
+  .start-trip-button {
+    min-width: 136px;
+    padding: 12px 18px;
+  }
+
+  .rider-pack img {
+    max-width: min(96vw, 360px);
+    max-height: 38vh;
+  }
+
+  .rider-pack p {
+    max-width: min(92vw, 360px);
+    font-size: clamp(1.25rem, 9vw, 1.8rem);
+  }
+}
+
+@media (max-height: 560px) {
+  .intro-loader .road-line {
+    bottom: 52px;
+  }
+
+  .rider-pack {
+    bottom: 72px;
+  }
+
+  .rider-pack img {
+    max-height: 52vh;
+  }
+
+  .rider-pack p {
+    margin-bottom: 0;
+  }
+}
+
+
+
+
 
 

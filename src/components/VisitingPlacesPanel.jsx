@@ -5,6 +5,14 @@ import { fetchVisitingPlaces, saveVisitingPlaces } from "../lib/visitingPlaces";
 const CUSTOM_PLACES_KEY = "Kodaikanal-custom-visiting-places";
 const STORAGE_KEY = "Kodaikanal-visiting-places";
 const VISITING_UPDATE_PIN = import.meta.env.VITE_TRIP_UPDATE_PIN || "";
+const VISITING_REFRESH_INTERVAL_MS = Math.max(
+  Number(
+    import.meta.env.VITE_VISITING_PLACES_REFRESH_INTERVAL_MS ||
+      import.meta.env.VITE_SHEET_REFRESH_INTERVAL_MS ||
+      15000,
+  ),
+  5000,
+);
 
 function getStoredArray(key) {
   try {
@@ -59,31 +67,40 @@ function VisitingPlacesPanel({ onClose, onToast }) {
   useEffect(() => {
     let cancelled = false;
 
-    async function loadPlaces() {
+    async function loadPlaces({ silent = false } = {}) {
       try {
-        setIsSyncing(true);
+        if (!silent) {
+          setIsSyncing(true);
+        }
+
         const data = await fetchVisitingPlaces();
 
         if (!cancelled && Array.isArray(data.places)) {
           setPlaces(data.places.map(normalizePlace));
         }
       } catch (error) {
-        if (!cancelled) {
+        if (!cancelled && !silent) {
           onToast("error", error.message || "Visiting places loaded from this browser only");
         }
       } finally {
-        if (!cancelled) {
+        if (!cancelled && !silent) {
           setIsSyncing(false);
         }
       }
     }
 
     loadPlaces();
+    const refreshTimer = window.setInterval(() => {
+      if (document.visibilityState !== "hidden") {
+        loadPlaces({ silent: true });
+      }
+    }, VISITING_REFRESH_INTERVAL_MS);
 
     return () => {
       cancelled = true;
+      window.clearInterval(refreshTimer);
     };
-  }, []);
+  }, [onToast]);
 
   useEffect(() => {
     window.localStorage.setItem(
@@ -381,3 +398,5 @@ function VisitingPlacesPanel({ onClose, onToast }) {
 }
 
 export default VisitingPlacesPanel;
+
+

@@ -346,7 +346,7 @@ h2 {
   align-items: flex-end;
   gap: 8px;
   min-width: max-content;
-  animation: routeCarMove 5.2s ease-in-out infinite;
+  animation: routeCarMove 8s ease-in-out infinite;
 }
 
 .route-rider {
@@ -509,7 +509,8 @@ h2 {
 
 .payment-edit-form input,
 .payment-edit-form select,
-.name-modal input {
+.name-modal input,
+.visiting-pin-form input {
   width: 100%;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
@@ -527,7 +528,8 @@ h2 {
 
 .payment-edit-form input:focus,
 .payment-edit-form select:focus,
-.name-modal input:focus {
+.name-modal input:focus,
+.visiting-pin-form input:focus {
   border-color: #0d7c66;
   outline: 3px solid rgba(13, 124, 102, 0.18);
 }
@@ -551,6 +553,187 @@ h2 {
 .table-panel {
   max-width: 100%;
   overflow: hidden;
+}
+
+.visiting-panel {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.visiting-access-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 16px 18px 0;
+  border: 1px solid #e6ebf2;
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 12px 14px;
+}
+
+.visiting-access-card strong {
+  color: #111827;
+  font-size: 1rem;
+}
+
+.visiting-access-card small {
+  display: block;
+  margin-top: 4px;
+  color: #536072;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.visiting-access-card span {
+  border-radius: 999px;
+  background: #111827;
+  color: #ffffff;
+  padding: 7px 10px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.visiting-pin-form {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) auto;
+  align-items: end;
+  gap: 10px;
+  margin: 12px 18px 0;
+  border: 1px solid #e6ebf2;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 14px;
+}
+
+.visiting-pin-form label {
+  display: grid;
+  gap: 6px;
+  color: #536072;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.visiting-pin-form button {
+  border: 1px solid #111827;
+  border-radius: 8px;
+  background: #111827;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 12px 16px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.visiting-pin-form button:hover,
+.visiting-pin-form button:focus-visible {
+  background: #0d7c66;
+  border-color: #0d7c66;
+  outline: none;
+}
+
+.visiting-pin-form button:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.visiting-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  gap: 12px;
+  padding: 18px;
+}
+
+.visiting-place {
+  position: relative;
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 12px;
+  min-height: 150px;
+  border: 1px solid #dce2ea;
+  border-radius: 8px;
+  background: #ffffff;
+  cursor: pointer;
+  padding: 16px;
+  box-shadow: 0 12px 36px rgba(18, 25, 38, 0.06);
+}
+
+.visiting-place input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.visit-check {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #111827;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.visit-copy {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.visit-copy strong {
+  color: #111827;
+  font-size: 1.05rem;
+  line-height: 1.1;
+}
+
+.visit-copy em {
+  color: #0d7c66;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.visit-copy small {
+  color: #536072;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.visiting-place:hover,
+.visiting-place:focus-within {
+  border-color: #111827;
+  box-shadow: 0 16px 44px rgba(18, 25, 38, 0.12);
+}
+
+.visiting-place.is-visited {
+  background: #f0fdf4;
+}
+
+.visiting-place.is-visited .visit-check {
+  background: #0d7c66;
+  border-color: #0d7c66;
+}
+
+.visiting-place.is-visited .visit-check::after {
+  content: "";
+  display: block;
+  width: 7px;
+  height: 12px;
+  margin: 2px 0 0 7px;
+  border: solid #ffffff;
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+
+.visiting-place.is-visited .visit-copy {
+  color: #667085;
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
+.visiting-place.is-locked {
+  cursor: not-allowed;
+  opacity: 0.78;
 }
 
 .table-actions {
@@ -1039,6 +1222,11 @@ tbody tr.is-paid td {
     min-width: 760px;
   }
 }
+
+
+
+
+
 
 
 

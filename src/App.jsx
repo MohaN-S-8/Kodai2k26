@@ -7,6 +7,7 @@ import Toast from "./components/Toast";
 import TripLoader from "./components/TripLoader";
 import TripMap from "./components/TripMap";
 import TravelRoute from "./components/TravelRoute";
+import VisitingPlacesPanel from "./components/VisitingPlacesPanel";
 import { BALANCE_COLUMN, PREFERRED_COLUMNS } from "./data/tripConfig";
 import { fetchTripSheetData, updateTripPayment } from "./lib/googleSheet";
 import { findMemberByName, isNumber } from "./utils/names";
@@ -19,7 +20,7 @@ function App() {
   const [error, setError] = useState("");
   const [activeView, setActiveView] = useState("home");
   const [showIntro, setShowIntro] = useState(true);
-  const [isNamePromptOpen, setIsNamePromptOpen] = useState(false);
+  const [promptTarget, setPromptTarget] = useState(null);
   const [nameError, setNameError] = useState("");
   const [selectedMember, setSelectedMember] = useState(null);
   const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
@@ -75,6 +76,10 @@ function App() {
       ),
     [memberRows]
   );
+  const promptNames = useMemo(
+    () => memberRows.map((row) => row.Name).filter(Boolean),
+    [memberRows]
+  );
 
   function showToast(type, message) {
     setToast({ type, message });
@@ -85,11 +90,24 @@ function App() {
     setActiveView("home");
     setSelectedMember(null);
     setNameError("");
+    setPromptTarget(null);
   }
 
   function openExpenseNamePrompt() {
     setNameError("");
-    setIsNamePromptOpen(true);
+    setPromptTarget("expenses");
+  }
+
+  function openVisitingPlaces() {
+    setActiveView("visiting");
+    setSelectedMember(null);
+    setNameError("");
+    setPromptTarget(null);
+  }
+
+  function closeNamePrompt() {
+    setNameError("");
+    setPromptTarget(null);
   }
 
   function applySheetData(data, currentMemberName = selectedMember?.Name) {
@@ -130,7 +148,8 @@ function App() {
   }
 
   function handleNameSubmit(name) {
-    const matchedMember = findMemberByName(memberRows, name);
+    const trimmedName = name.trim();
+    const matchedMember = findMemberByName(memberRows, trimmedName);
 
     if (!matchedMember) {
       setNameError("Name not found in the trip sheet. Try the same spelling from the sheet.");
@@ -138,9 +157,8 @@ function App() {
     }
 
     setSelectedMember(matchedMember);
-    setActiveView("expenses");
-    setIsNamePromptOpen(false);
-    setNameError("");
+    setActiveView(promptTarget || "expenses");
+    closeNamePrompt();
   }
 
   if (showIntro) {
@@ -164,8 +182,9 @@ function App() {
 
       {status === "ready" && rows.length > 0 && (
         <ActionMenu
-          isActive={activeView === "expenses"}
+          activeView={activeView}
           onOpenExpenses={openExpenseNamePrompt}
+          onOpenVisiting={openVisitingPlaces}
         />
       )}
 
@@ -201,12 +220,23 @@ function App() {
         />
       )}
 
+      {status === "ready" && rows.length > 0 && activeView === "visiting" && (
+        <VisitingPlacesPanel
+          onClose={returnHome}
+          onToast={showToast}
+        />
+      )}
+
       <Toast toast={toast} onClose={() => setToast(null)} />
 
-      {isNamePromptOpen && (
+      {promptTarget && (
         <NamePromptModal
           error={nameError}
-          onClose={() => setIsNamePromptOpen(false)}
+          eyebrow="Verify enemy"
+          names={promptNames}
+          submitLabel="Show Balance"
+          title="Select your name"
+          onClose={closeNamePrompt}
           onSubmit={handleNameSubmit}
         />
       )}
@@ -215,5 +245,8 @@ function App() {
 }
 
 export default App;
+
+
+
 
 

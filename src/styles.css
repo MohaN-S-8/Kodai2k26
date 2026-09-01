@@ -110,14 +110,10 @@ h2 {
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 16px;
   margin-bottom: 18px;
-  border: 1px solid #dce2ea;
-  border-radius: 8px;
-  background: #ffffff;
-  padding: 16px 18px;
-  box-shadow: 0 12px 42px rgba(18, 25, 38, 0.06);
+  padding: 0;
 }
 
 .menu-option {
@@ -137,6 +133,8 @@ h2 {
 .menu-option:focus-visible,
 .menu-option.is-active {
   background: #0d7c66;
+  color: #ffffff;
+  border-color: #0d7c66;
   outline: none;
 }
 
@@ -238,11 +236,35 @@ h2 {
   border-bottom: 1px solid #e6ebf2;
 }
 
-.table-heading > span {
+.table-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   flex: 0 0 auto;
+}
+
+.table-actions span {
   color: #536072;
   font-size: 0.92rem;
   font-weight: 800;
+}
+
+.close-panel-button {
+  border: 1px solid #d7deea;
+  border-radius: 8px;
+  background: #111827;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 9px 12px;
+  font-weight: 900;
+}
+
+.close-panel-button:hover,
+.close-panel-button:focus-visible {
+  background: #b42318;
+  border-color: #b42318;
+  color: #ffffff;
+  outline: none;
 }
 
 .table-scroll {
@@ -261,8 +283,8 @@ th,
 td {
   border-bottom: 1px solid #e6ebf2;
   padding: 14px 16px;
-  text-align: left;
-  vertical-align: top;
+  text-align: center;
+  vertical-align: middle;
   white-space: nowrap;
 }
 
@@ -270,8 +292,8 @@ th {
   position: sticky;
   top: 0;
   z-index: 1;
-  background: #111827;
-  color: #ffffff;
+  background: #ffffff;
+  color: #111827;
   font-size: 0.78rem;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -284,7 +306,7 @@ td {
 
 .money {
   font-variant-numeric: tabular-nums;
-  text-align: right;
+  text-align: center;
 }
 
 tbody tr:nth-child(even) {
@@ -415,8 +437,8 @@ tbody tr:hover {
   min-width: 156px;
   border: 0;
   border-radius: 999px;
-  background: #111827;
-  color: #ffffff;
+  background: #ffffff;
+  color: #111827;
   cursor: pointer;
   padding: 14px 22px;
   font-size: 1rem;
@@ -465,7 +487,7 @@ tbody tr:hover {
   }
 
   .stats {
-    justify-content: flex-start;
+    justify-content: space-between;
   }
 
   table {
@@ -482,16 +504,18 @@ tbody tr:hover {
   .map-panel {
     height: clamp(280px, 46vh, 420px);
     margin-bottom: 14px;
-  }
-
-  .action-strip {
+  }  .action-strip {
     align-items: flex-start;
     flex-direction: column;
-    padding: 14px;
   }
 
   .menu-option {
     width: 100%;
+  }
+
+  .table-actions {
+    width: 100%;
+    justify-content: space-between;
   }
 
   th,
@@ -539,3 +563,38 @@ tbody tr:hover {
     min-width: 760px;
   }
 }
+
+
+.brand-home {
+  display: inline-grid;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.brand-home strong {
+  max-width: 760px;
+  color: #111827;
+  font-size: clamp(2rem, 6vw, 4rem);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: 0;
+}
+
+.brand-home:hover strong,
+.brand-home:focus-visible strong {
+  color: #0d7c66;
+}
+
+.brand-home:focus-visible {
+  outline: 3px solid rgba(13, 124, 102, 0.22);
+  outline-offset: 6px;
+  border-radius: 8px;
+}
+
+
+
+
+

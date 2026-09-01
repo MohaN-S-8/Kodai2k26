@@ -175,9 +175,9 @@ function App() {
       "No",
       "Name",
       "Total Share",
-  "Total given",
-  "Entry fee ~ 500",
-  "Balance Amount From per Person Without food",
+      "Total given",
+      "Entry fee ~ 500",
+      "Balance Amount From per Person Without food",
     ];
 
     const availablePreferred = preferredColumns.filter((column) =>
@@ -192,7 +192,11 @@ function App() {
       memberRows.reduce(
         (total, row) =>
           total +
-          Number(String(row["Balance Amount From per Person Without food"] || 0).replace(/,/g, "")),
+          Number(
+            String(
+              row["Balance Amount From per Person Without food"] || 0,
+            ).replace(/,/g, ""),
+          ),
         0,
       ),
     [memberRows],
@@ -206,11 +210,11 @@ function App() {
     <main className="page-shell">
       <section className="top-bar">
         <div>
-          <p className="eyebrow">Kodai trip sheet</p>
-          <h1>Trip Balance Table</h1>
+          <p className="eyebrow">Kodai trip </p>
+          {/* <h1>Trip Balance Table</h1> */}
         </div>
         <div className="stats">
-          <span>{memberRows.length} Enemies</span>
+          <span>{memberRows.length} people</span>
           <span>Rs {formatMoney(totalBalance)} balance</span>
           {/* <span>{displayColumns.length} columns</span> */}
         </div>
@@ -220,15 +224,6 @@ function App() {
 
       {status === "ready" && rows.length > 0 && (
         <section className="action-strip" aria-label="Trip actions">
-          <div>
-            <p className="eyebrow">Choose your chaos</p>
-            <h2>
-              {activeView === "expenses"
-                ? "Overall Cost & Expense"
-                : ""}
-            </h2>
-          </div>
-
           <button
             className={`menu-option ${activeView === "expenses" ? "is-active" : ""}`}
             type="button"
@@ -274,10 +269,20 @@ function App() {
           <section className="table-panel" aria-label="Google Sheet data">
             <div className="table-heading">
               <div>
-                <p className="eyebrow">Live from Google Sheet</p>
-                <h2>Enemies Payment Status</h2>
+                {/* <p className="eyebrow">Live from Google Sheet</p> */}
+                <h2>Payment Status</h2>
               </div>
-              <span>{memberRows.length} people listed</span>
+              <div className="table-actions">
+                <span>{memberRows.length} people listed</span>
+                <button
+                  className="close-panel-button"
+                  type="button"
+                  aria-label="Close overall cost and expense"
+                  onClick={() => setActiveView("home")}
+                >
+                  Close
+                </button>
+              </div>
             </div>
 
             <div className="table-scroll">
@@ -315,5 +320,3 @@ function App() {
 }
 
 export default App;
-
-

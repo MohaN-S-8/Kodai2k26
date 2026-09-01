@@ -12,6 +12,7 @@ html {
 
 * {
   box-sizing: border-box;
+  font-family: Inter;
 }
 
 body {
@@ -50,8 +51,8 @@ select {
   letter-spacing: 0;
   text-transform: uppercase;
 }
-.eyebrow p {
-}
+/* .eyebrow p {
+} */
 h1,
 h2 {
   margin: 0;

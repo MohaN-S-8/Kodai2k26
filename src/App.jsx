@@ -6,6 +6,7 @@ import NamePromptModal from "./components/NamePromptModal";
 import Toast from "./components/Toast";
 import TripLoader from "./components/TripLoader";
 import TripMap from "./components/TripMap";
+import TravelRoute from "./components/TravelRoute";
 import { BALANCE_COLUMN, PREFERRED_COLUMNS } from "./data/tripConfig";
 import { fetchTripSheetData, updateTripPayment } from "./lib/googleSheet";
 import { findMemberByName, isNumber } from "./utils/names";
@@ -154,7 +155,12 @@ function App() {
         onHome={returnHome}
       />
 
-      {status === "ready" && rows.length > 0 && <TripMap />}
+      {status === "ready" && rows.length > 0 && (
+        <>
+          <TravelRoute />
+          <TripMap />
+        </>
+      )}
 
       {status === "ready" && rows.length > 0 && (
         <ActionMenu
@@ -209,3 +215,5 @@ function App() {
 }
 
 export default App;
+
+

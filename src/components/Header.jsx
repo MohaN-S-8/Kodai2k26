@@ -4,7 +4,9 @@ function Header({ peopleCount, totalBalance, onHome }) {
   return (
     <section className="top-bar">
       <button className="brand-home" type="button" onClick={onHome}>
-        <span className="eyebrow">Kodai trip</span>
+        <span className="eyebrow">
+          <h1>Kodai trip</h1>
+        </span>
       </button>
       <div className="stats">
         <span>{peopleCount} people</span>

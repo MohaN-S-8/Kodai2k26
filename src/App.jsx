@@ -3,6 +3,7 @@ import ActionMenu from "./components/ActionMenu";
 import ExpensePanel from "./components/ExpensePanel";
 import Header from "./components/Header";
 import NamePromptModal from "./components/NamePromptModal";
+import Toast from "./components/Toast";
 import TripLoader from "./components/TripLoader";
 import TripMap from "./components/TripMap";
 import { BALANCE_COLUMN, PREFERRED_COLUMNS } from "./data/tripConfig";
@@ -22,6 +23,7 @@ function App() {
   const [selectedMember, setSelectedMember] = useState(null);
   const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
   const [paymentUpdateError, setPaymentUpdateError] = useState("");
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -73,6 +75,11 @@ function App() {
     [memberRows]
   );
 
+  function showToast(type, message) {
+    setToast({ type, message });
+    window.setTimeout(() => setToast(null), 3200);
+  }
+
   function returnHome() {
     setActiveView("home");
     setSelectedMember(null);
@@ -112,8 +119,10 @@ function App() {
         pin,
       });
       applySheetData(data, selectedMember?.Name);
+      showToast("success", `${targetName} payment updated successfully`);
     } catch (updateError) {
       setPaymentUpdateError(updateError.message);
+      showToast("error", updateError.message || "Payment update failed");
     } finally {
       setIsUpdatingPayment(false);
     }
@@ -186,6 +195,8 @@ function App() {
         />
       )}
 
+      <Toast toast={toast} onClose={() => setToast(null)} />
+
       {isNamePromptOpen && (
         <NamePromptModal
           error={nameError}
@@ -198,5 +209,3 @@ function App() {
 }
 
 export default App;
-
-

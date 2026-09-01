@@ -1,9 +1,7 @@
 :root {
   color: #18202f;
   background: #f7f8fb;
-  font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+  font-family: Inter;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -46,17 +44,18 @@ select {
 
 .eyebrow {
   margin: 0 0 6px;
-  color: #0d7c66;
+  color: #210f37;
   font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: 0;
   text-transform: uppercase;
 }
-
+.eyebrow p {
+}
 h1,
 h2 {
   margin: 0;
-  color: #111827;
+  color: #09122c;
   letter-spacing: 0;
 }
 
@@ -78,9 +77,9 @@ h2 {
 }
 
 .stats span {
-  border: 1px solid #d9dee9;
-  border-radius: 999px;
-  background: #ffffff;
+  /* border: 1px solid #d9dee9; */
+  /* border-radius: 999px; */
+  /* background: #ffffff; */
   color: #394254;
   padding: 8px 12px;
   font-size: 0.9rem;
@@ -108,7 +107,7 @@ h2 {
 
 .brand-home:hover strong,
 .brand-home:focus-visible strong {
-  color: #0d7c66;
+  color: #210f37;
 }
 
 .brand-home:focus-visible {
@@ -221,8 +220,8 @@ h2 {
 .modal-actions button:focus-visible,
 .payment-edit-form button:hover,
 .payment-edit-form button:focus-visible {
-  background: #0d7c66;
-  border-color: #0d7c66;
+  background: #210f37;
+  border-color: #210f37;
   color: #ffffff;
   outline: none;
 }
@@ -252,7 +251,9 @@ h2 {
 .route-preview {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(110px, 0.8fr) minmax(90px, 1fr) minmax(120px, 0.9fr) minmax(90px, 1fr) minmax(110px, 0.8fr);
+  grid-template-columns:
+    minmax(110px, 0.8fr) minmax(90px, 1fr) minmax(120px, 0.9fr)
+    minmax(90px, 1fr) minmax(110px, 0.8fr);
   align-items: center;
   gap: 14px;
   min-height: clamp(190px, 28vw, 300px);
@@ -290,7 +291,11 @@ h2 {
   position: relative;
   height: 8px;
   border-radius: 999px;
-  background: repeating-linear-gradient(90deg, #111827 0 22px, transparent 22px 38px);
+  background: repeating-linear-gradient(
+    90deg,
+    #111827 0 22px,
+    transparent 22px 38px
+  );
 }
 
 .route-line span {
@@ -320,7 +325,12 @@ h2 {
   position: relative;
   height: clamp(130px, 18vw, 190px);
   overflow: hidden;
-  background: linear-gradient(180deg, #dbe7d2 0 42%, #303741 42% 70%, #b6caa6 70% 100%);
+  background: linear-gradient(
+    180deg,
+    #dbe7d2 0 42%,
+    #303741 42% 70%,
+    #b6caa6 70% 100%
+  );
 }
 
 .route-dashes {
@@ -346,7 +356,7 @@ h2 {
   align-items: flex-end;
   gap: 8px;
   min-width: max-content;
-  animation: routeCarMove 8s ease-in-out infinite;
+  animation: routeCarMove 12s ease-in-out infinite;
 }
 
 .route-rider {
@@ -359,7 +369,7 @@ h2 {
 }
 
 .route-van {
-  width: min(160px, 28vw);
+  width: min(280px, 28vw);
   height: auto;
   margin: 0 0 28px 6px;
   object-fit: contain;
@@ -444,7 +454,7 @@ h2 {
   margin-bottom: 18px;
   border: 6px solid #e2e8f0;
   border-top-color: #f59e0b;
-  border-right-color: #0d7c66;
+  border-right-color: #210f37;
   border-radius: 50%;
   animation: spin 0.85s linear infinite;
 }
@@ -532,7 +542,7 @@ h2 {
 .name-modal input:focus,
 .visiting-pin-form input:focus,
 .add-place-form input:focus {
-  border-color: #0d7c66;
+  border-color: #210f37;
   outline: 3px solid rgba(13, 124, 102, 0.18);
 }
 
@@ -611,7 +621,9 @@ h2 {
 }
 
 .add-place-form {
-  grid-template-columns: minmax(150px, 1fr) minmax(120px, 0.75fr) minmax(180px, 1.2fr) auto;
+  grid-template-columns:
+    minmax(150px, 1fr) minmax(120px, 0.75fr) minmax(180px, 1.2fr)
+    auto;
   background: #f8fafc;
 }
 
@@ -641,8 +653,8 @@ h2 {
 .visiting-pin-form button:focus-visible,
 .add-place-form button:hover,
 .add-place-form button:focus-visible {
-  background: #0d7c66;
-  border-color: #0d7c66;
+  background: #210f37;
+  border-color: #210f37;
   outline: none;
 }
 
@@ -704,7 +716,7 @@ h2 {
 }
 
 .visit-copy em {
-  color: #0d7c66;
+  color: #210f37;
   font-style: normal;
   font-weight: 900;
 }
@@ -727,8 +739,8 @@ h2 {
 }
 
 .visiting-place.is-visited .visit-check {
-  background: #0d7c66;
-  border-color: #0d7c66;
+  background: #210f37;
+  border-color: #210f37;
 }
 
 .visiting-place.is-visited .visit-check::after {
@@ -873,7 +885,7 @@ tbody tr.is-paid td {
 }
 
 .toast-success {
-  background: #0d7c66;
+  background: #210f37;
 }
 
 .toast-error {
@@ -920,15 +932,28 @@ tbody tr.is-paid td {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.88) 0 9%, transparent 10%),
-    radial-gradient(circle at 68% 20%, rgba(255, 255, 255, 0.72) 0 7%, transparent 8%);
+    radial-gradient(
+      circle at 18% 18%,
+      rgba(255, 255, 255, 0.88) 0 9%,
+      transparent 10%
+    ),
+    radial-gradient(
+      circle at 68% 20%,
+      rgba(255, 255, 255, 0.72) 0 7%,
+      transparent 8%
+    );
   opacity: 0;
   transition: opacity 220ms ease;
 }
 
 .intro-loader.is-started {
-  background:
-    linear-gradient(180deg, #dff6ff 0%, #fff7df 58%, #dbe7d2 58%, #b6caa6 100%);
+  background: linear-gradient(
+    180deg,
+    #dff6ff 0%,
+    #fff7df 58%,
+    #dbe7d2 58%,
+    #b6caa6 100%
+  );
 }
 
 .intro-loader.is-started::before {
@@ -968,7 +993,9 @@ tbody tr.is-paid td {
   height: 100%;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 220ms ease, visibility 0s linear 220ms;
+  transition:
+    opacity 220ms ease,
+    visibility 0s linear 220ms;
 }
 
 .rider-pack {
@@ -991,7 +1018,10 @@ tbody tr.is-paid td {
   object-fit: contain;
   filter: drop-shadow(0 24px 22px rgba(17, 24, 39, 0.28));
 }
-
+.hill {
+  width: 18%;
+  height: auto;
+}
 .rider-pack p {
   margin: 0 0 clamp(18px, 5vw, 68px);
   color: #121826;
@@ -1035,7 +1065,7 @@ tbody tr.is-paid td {
 
 .start-trip-button:hover,
 .start-trip-button:focus-visible {
-  background: #0d7c66;
+  background: #210f37;
   outline: 3px solid rgba(13, 124, 102, 0.22);
   outline-offset: 4px;
 }
@@ -1171,7 +1201,7 @@ tbody tr.is-paid td {
     padding: 12px;
     font-size: 0.86rem;
   }
-.route-road {
+  .route-road {
     height: 130px;
   }
 
@@ -1239,19 +1269,3 @@ tbody tr.is-paid td {
     min-width: 760px;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

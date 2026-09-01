@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { VISITING_PLACES } from "../data/visitingPlaces";
 import { fetchVisitingPlaces, saveVisitingPlaces } from "../lib/visitingPlaces";
 
-const CUSTOM_PLACES_KEY = "kodai-custom-visiting-places";
-const STORAGE_KEY = "kodai-visiting-places";
+const CUSTOM_PLACES_KEY = "Kodaikanal-custom-visiting-places";
+const STORAGE_KEY = "Kodaikanal-visiting-places";
 const VISITING_UPDATE_PIN = import.meta.env.VITE_TRIP_UPDATE_PIN || "";
 
 function getStoredArray(key) {
@@ -215,10 +215,14 @@ function VisitingPlacesPanel({ onClose, onToast }) {
       <div className="table-heading">
         <div>
           <p className="eyebrow">Visiting places</p>
-          <h2>Kodai stop checklist</h2>
+          <h2>Kodaikanal stop checklist</h2>
         </div>
         <div className="table-actions">
-          <span>{isSyncing ? "Syncing..." : `${visitedCount} / ${places.length} done`}</span>
+          <span>
+            {isSyncing
+              ? "Syncing..."
+              : `${visitedCount} / ${places.length} done`}
+          </span>
           <button
             className="close-panel-button"
             type="button"
@@ -232,8 +236,14 @@ function VisitingPlacesPanel({ onClose, onToast }) {
 
       <div className="visiting-access-card">
         <div>
-          <strong>{isPinUnlocked ? "Update access enabled" : "View only"}</strong>
-          <small>{isPinUnlocked ? "Changes sync to the Visiting Places sheet" : "Enter Trip PIN to update the checklist"}</small>
+          <strong>
+            {isPinUnlocked ? "Update access enabled" : "View only"}
+          </strong>
+          <small>
+            {isPinUnlocked
+              ? "Changes sync to the Visiting Places sheet"
+              : "Enter Trip PIN to update the checklist"}
+          </small>
         </div>
         <span>{isPinUnlocked ? "Editor" : "View only"}</span>
       </div>

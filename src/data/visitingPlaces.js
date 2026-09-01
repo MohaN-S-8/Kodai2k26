@@ -27,7 +27,7 @@ export const VISITING_PLACES = [
     id: "pillar-rocks",
     name: "Pillar Rocks",
     cost: "Rs 10 approx",
-    note: "Classic viewpoint stop on the Kodai side.",
+    note: "Classic viewpoint stop on the Kodaikanal side.",
   },
   {
     id: "green-valley-view",

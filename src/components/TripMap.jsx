@@ -3,10 +3,10 @@ const STAY_EMBED_URL = import.meta.env.VITE_STAY_EMBED_URL || "";
 
 function TripMap() {
   return (
-    <section className="map-section" aria-label="Kodai trip staying place">
+    <section className="map-section" aria-label="Kodaikanal Trip staying place">
       <div className="stay-card">
         <div>
-          <p className="eyebrow">Staying place</p>
+          <p className="eyebrow">Stay</p>
           <h2>Zion Elite Residency</h2>
         </div>
         <a className="map-link-button" href={STAY_MAP_URL} target="_blank" rel="noreferrer">

@@ -5,7 +5,10 @@ function Header({ peopleCount, totalBalance, onHome }) {
     <section className="top-bar">
       <button className="brand-home" type="button" onClick={onHome}>
         <span className="eyebrow">
-          <h1>Kodai trip</h1>
+          <h1>
+            Kodaikanal Trip
+            <img className="hill" src="/images/hill.png" alt="hill" />
+          </h1>
         </span>
       </button>
       <div className="stats">

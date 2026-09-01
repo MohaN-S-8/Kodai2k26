@@ -19,12 +19,12 @@ const COMMON_COSTS = [
   },
   {
     label: "Food",
-    value: "1500",
+    value: "~1500",
     note: "Per person for 2 days",
   },
   {
     label: "Entry Fee",
-    value: "500",
+    value: "~500",
     note: "Per person",
   },
 ];
@@ -32,25 +32,17 @@ const COMMON_COSTS = [
 const COLUMN_LABELS = {
   No: "No",
   Name: "Name",
-  "Van Share": "Van Share",
-  "Room Share": "Room Share",
-  "ROOM GIVEN": "Room Given",
-  "van given": "Van Given",
-  "VAN BALANCE": "Van Balance",
-  "ROOM bALANCE": "Room Balance",
-  "Balance [Travel &Stay]": "Travel & Stay Balance",
-  Total: "Total",
+  "Total Share": "Total Share",
+  "Total given": "Total Given",
+  "Entry fee ~ 500": "Entry Fee ~ 500",
+  "Balance Amount From per Person Without food": "Balance Without Food",
 };
 
 const MONEY_COLUMNS = new Set([
-  "Van Share",
-  "Room Share",
-  "ROOM GIVEN",
-  "van given",
-  "VAN BALANCE",
-  "ROOM bALANCE",
-  "Balance [Travel &Stay]",
-  "Total",
+  "Total Share",
+  "Total given",
+  "Entry fee ~ 500",
+  "Balance Amount From per Person Without food",
 ]);
 
 function isNumber(value) {
@@ -142,11 +134,10 @@ function App() {
   const [rows, setRows] = useState([]);
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState("home");
   const [showIntro, setShowIntro] = useState(true);
 
-useEffect(() => {
+  useEffect(() => {
     let cancelled = false;
 
     async function loadSheet() {
@@ -176,25 +167,21 @@ useEffect(() => {
 
   const memberRows = useMemo(
     () => rows.filter((row) => isNumber(row.No) && row.Name),
-    [rows]
+    [rows],
   );
 
   const displayColumns = useMemo(() => {
     const preferredColumns = [
       "No",
       "Name",
-      "Van Share",
-      "Room Share",
-      "ROOM GIVEN",
-      "van given",
-      "VAN BALANCE",
-      "ROOM bALANCE",
-      "Balance [Travel &Stay]",
-      "Total",
+      "Total Share",
+  "Total given",
+  "Entry fee ~ 500",
+  "Balance Amount From per Person Without food",
     ];
 
     const availablePreferred = preferredColumns.filter((column) =>
-      columns.includes(column)
+      columns.includes(column),
     );
 
     return availablePreferred.length > 0 ? availablePreferred : columns;
@@ -205,10 +192,10 @@ useEffect(() => {
       memberRows.reduce(
         (total, row) =>
           total +
-          Number(String(row["Balance [Travel &Stay]"] || 0).replace(/,/g, "")),
-        0
+          Number(String(row["Balance Amount From per Person Without food"] || 0).replace(/,/g, "")),
+        0,
       ),
-    [memberRows]
+    [memberRows],
   );
 
   if (showIntro) {
@@ -223,9 +210,9 @@ useEffect(() => {
           <h1>Trip Balance Table</h1>
         </div>
         <div className="stats">
-          <span>{memberRows.length} friends</span>
+          <span>{memberRows.length} Enemies</span>
           <span>Rs {formatMoney(totalBalance)} balance</span>
-          <span>{displayColumns.length} columns</span>
+          {/* <span>{displayColumns.length} columns</span> */}
         </div>
       </section>
 
@@ -238,39 +225,17 @@ useEffect(() => {
             <h2>
               {activeView === "expenses"
                 ? "Overall Cost & Expense"
-                : "Trip Control Panel"}
+                : ""}
             </h2>
           </div>
 
-          <div className="menu-wrap">
-            <button
-              aria-expanded={isMenuOpen}
-              aria-haspopup="menu"
-              aria-label="Open trip options"
-              className="meatball-button"
-              onClick={() => setIsMenuOpen((open) => !open)}
-              type="button"
-            >
-              <span />
-              <span />
-              <span />
-            </button>
-
-            {isMenuOpen && (
-              <div className="options-menu" role="menu">
-                <button
-                  role="menuitem"
-                  type="button"
-                  onClick={() => {
-                    setActiveView("expenses");
-                    setIsMenuOpen(false);
-                  }}
-                >
-                  Overall Cost & Expense
-                </button>
-              </div>
-            )}
-          </div>
+          <button
+            className={`menu-option ${activeView === "expenses" ? "is-active" : ""}`}
+            type="button"
+            onClick={() => setActiveView("expenses")}
+          >
+            Overall Cost & Expense
+          </button>
         </section>
       )}
 
@@ -294,7 +259,7 @@ useEffect(() => {
         </section>
       )}
 
-{status === "ready" && rows.length > 0 && activeView === "expenses" && (
+      {status === "ready" && rows.length > 0 && activeView === "expenses" && (
         <>
           <section className="summary-grid" aria-label="Common trip costs">
             {COMMON_COSTS.map((cost) => (
@@ -310,7 +275,7 @@ useEffect(() => {
             <div className="table-heading">
               <div>
                 <p className="eyebrow">Live from Google Sheet</p>
-                <h2>Friends Payment Status</h2>
+                <h2>Enemies Payment Status</h2>
               </div>
               <span>{memberRows.length} people listed</span>
             </div>
@@ -350,7 +315,5 @@ useEffect(() => {
 }
 
 export default App;
-
-
 
 

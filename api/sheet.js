@@ -1,6 +1,3 @@
-const SHEET_CSV_URL = import.meta.env.VITE_TRIP_SHEET_CSV_URL;
-const SHEET_API_URL = import.meta.env.VITE_TRIP_SHEET_API_URL;
-
 function parseCsv(csvText) {
   const records = [];
   let field = "";
@@ -71,36 +68,41 @@ function parseCsv(csvText) {
   return { columns, rows };
 }
 
-async function fetchFromApi() {
-  const response = await fetch(SHEET_API_URL);
+export default async function handler(request, response) {
+  response.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
+  response.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  if (!response.ok) {
-    throw new Error(`Trip sheet API failed with ${response.status}`);
+  if (request.method === "OPTIONS") {
+    response.status(204).end();
+    return;
   }
 
-  return response.json();
-}
-
-async function fetchFromCsv() {
-  if (!SHEET_CSV_URL) {
-    throw new Error("Missing VITE_TRIP_SHEET_CSV_URL environment variable");
+  if (request.method !== "GET") {
+    response.status(405).json({ error: "Method not allowed" });
+    return;
   }
 
-  const cleanUrl = SHEET_CSV_URL.replace(/\\&/g, "&").trim();
-  const response = await fetch(cleanUrl);
+  const sheetUrl = process.env.TRIP_SHEET_CSV_URL || process.env.VITE_TRIP_SHEET_CSV_URL;
 
-  if (!response.ok) {
-    throw new Error(`Google Sheet fetch failed with ${response.status}`);
+  if (!sheetUrl) {
+    response.status(500).json({ error: "Missing TRIP_SHEET_CSV_URL environment variable" });
+    return;
   }
 
-  const csvText = await response.text();
-  return parseCsv(csvText);
-}
+  try {
+    const cleanUrl = sheetUrl.replace(/\\&/g, "&").trim();
+    const sheetResponse = await fetch(cleanUrl);
 
-export async function fetchTripSheetData() {
-  if (SHEET_API_URL) {
-    return fetchFromApi();
+    if (!sheetResponse.ok) {
+      response.status(sheetResponse.status).json({
+        error: `Google Sheet fetch failed with ${sheetResponse.status}`,
+      });
+      return;
+    }
+
+    const csvText = await sheetResponse.text();
+    response.status(200).json(parseCsv(csvText));
+  } catch (error) {
+    response.status(500).json({ error: error.message || "Failed to fetch sheet" });
   }
-
-  return fetchFromCsv();
 }

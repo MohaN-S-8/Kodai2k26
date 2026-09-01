@@ -88,6 +88,24 @@ h2 {
   white-space: nowrap;
 }
 
+.map-panel {
+  width: 100%;
+  height: clamp(320px, 52vh, 560px);
+  margin-bottom: 18px;
+  border: 1px solid #dce2ea;
+  border-radius: 8px;
+  background: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 18px 60px rgba(18, 25, 38, 0.08);
+}
+
+.map-panel iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
 .action-strip {
   position: relative;
   display: flex;
@@ -102,65 +120,23 @@ h2 {
   box-shadow: 0 12px 42px rgba(18, 25, 38, 0.06);
 }
 
-.menu-wrap {
-  position: relative;
+.menu-option {
   flex: 0 0 auto;
-}
-
-.meatball-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  width: 44px;
-  height: 44px;
   border: 1px solid #d7deea;
-  border-radius: 50%;
-  background: #111827;
-  cursor: pointer;
-}
-
-.meatball-button:hover,
-.meatball-button:focus-visible {
-  background: #0d7c66;
-  outline: none;
-}
-
-.meatball-button span {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #ffffff;
-}
-
-.options-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  z-index: 5;
-  width: min(230px, calc(100vw - 40px));
-  border: 1px solid #dce2ea;
   border-radius: 8px;
-  background: #ffffff;
-  padding: 8px;
-  box-shadow: 0 18px 60px rgba(18, 25, 38, 0.18);
-}
-
-.options-menu button {
-  width: 100%;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: #172033;
+  background: #111827;
+  color: #ffffff;
   cursor: pointer;
-  padding: 12px;
-  text-align: left;
-  font-weight: 800;
+  padding: 13px 16px;
+  font-weight: 900;
+  text-align: center;
+  box-shadow: 0 10px 28px rgba(17, 24, 39, 0.12);
 }
 
-.options-menu button:hover,
-.options-menu button:focus-visible {
-  background: #fff8df;
+.menu-option:hover,
+.menu-option:focus-visible,
+.menu-option.is-active {
+  background: #0d7c66;
   outline: none;
 }
 
@@ -351,8 +327,6 @@ tbody tr:hover {
 }
 
 .road-line {
-  opacity: 0;
-  transition: opacity 220ms ease;
   position: absolute;
   left: 0;
   right: 0;
@@ -360,6 +334,8 @@ tbody tr:hover {
   height: clamp(26px, 4vh, 40px);
   background: #3a3f48;
   box-shadow: 0 12px 0 #272b31;
+  opacity: 0;
+  transition: opacity 220ms ease;
 }
 
 .road-line::after {
@@ -377,12 +353,13 @@ tbody tr:hover {
 }
 
 .rider-track {
-  opacity: 0;
-  transition: opacity 220ms ease;
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 220ms ease, visibility 0s linear 220ms;
 }
 
 .rider-pack {
@@ -415,6 +392,43 @@ tbody tr:hover {
   letter-spacing: 0;
   text-shadow: 0 4px 0 rgba(255, 255, 255, 0.75);
   white-space: nowrap;
+}
+
+.intro-loader.is-started .road-line,
+.intro-loader.is-started .rider-track {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.intro-loader.is-started .road-line::after,
+.intro-loader.is-started .rider-pack {
+  animation-play-state: running;
+}
+
+.start-trip-button {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  transform: translate(-50%, -50%);
+  min-width: 156px;
+  border: 0;
+  border-radius: 999px;
+  background: #111827;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 14px 22px;
+  font-size: 1rem;
+  font-weight: 900;
+  box-shadow: 0 18px 50px rgba(17, 24, 39, 0.24);
+}
+
+.start-trip-button:hover,
+.start-trip-button:focus-visible {
+  background: #0d7c66;
+  outline: 3px solid rgba(13, 124, 102, 0.22);
+  outline-offset: 4px;
 }
 
 @keyframes spin {
@@ -465,13 +479,19 @@ tbody tr:hover {
     padding: 22px 0;
   }
 
+  .map-panel {
+    height: clamp(280px, 46vh, 420px);
+    margin-bottom: 14px;
+  }
+
   .action-strip {
     align-items: flex-start;
+    flex-direction: column;
     padding: 14px;
   }
 
-  .options-menu {
-    right: 0;
+  .menu-option {
+    width: 100%;
   }
 
   th,
@@ -517,71 +537,5 @@ tbody tr:hover {
 
   table {
     min-width: 760px;
-  }
-}
-
-.intro-loader.is-started .road-line::after,
-.intro-loader.is-started .rider-pack {
-  animation-play-state: running;
-}
-
-.start-trip-button {
-  position: absolute;
-  left: 50%;
-  top: 42%;
-  z-index: 4;
-  transform: translate(-50%, -50%);
-  min-width: 156px;
-  border: 0;
-  border-radius: 999px;
-  background: #111827;
-  color: #ffffff;
-  cursor: pointer;
-  padding: 14px 22px;
-  font-size: 1rem;
-  font-weight: 900;
-  box-shadow: 0 18px 50px rgba(17, 24, 39, 0.24);
-}
-
-.start-trip-button:hover,
-.start-trip-button:focus-visible {
-  background: #0d7c66;
-  outline: 3px solid rgba(13, 124, 102, 0.22);
-  outline-offset: 4px;
-}
-
-@media (max-width: 720px) {
-  .start-trip-button {
-    top: 35%;
-  }
-}
-
-.intro-loader.is-started .road-line,
-.intro-loader.is-started .rider-track {
-  opacity: 1;
-}
-
-.map-panel {
-  width: 100%;
-  height: clamp(320px, 52vh, 560px);
-  margin-bottom: 18px;
-  border: 1px solid #dce2ea;
-  border-radius: 8px;
-  background: #ffffff;
-  overflow: hidden;
-  box-shadow: 0 18px 60px rgba(18, 25, 38, 0.08);
-}
-
-.map-panel iframe {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-
-@media (max-width: 720px) {
-  .map-panel {
-    height: clamp(280px, 46vh, 420px);
-    margin-bottom: 14px;
   }
 }

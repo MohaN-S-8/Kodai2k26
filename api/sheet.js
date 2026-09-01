@@ -316,6 +316,9 @@ async function readJsonBody(request) {
 export default async function handler(request, response) {
   response.setHeader("Access-Control-Allow-Methods", "GET,PATCH,OPTIONS");
   response.setHeader("Access-Control-Allow-Headers", "Content-Type,X-Trip-Update-Pin");
+  response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  response.setHeader("Pragma", "no-cache");
+  response.setHeader("Expires", "0");
 
   if (request.method === "OPTIONS") {
     response.status(204).end();
@@ -341,5 +344,6 @@ export default async function handler(request, response) {
     });
   }
 }
+
 
 

@@ -1,6 +1,11 @@
 const SHEET_CSV_URL = import.meta.env.VITE_TRIP_SHEET_CSV_URL;
 const SHEET_API_URL = import.meta.env.VITE_TRIP_SHEET_API_URL;
 
+function withCacheBust(url) {
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}_=${Date.now()}`;
+}
+
 function parseCsv(csvText) {
   const records = [];
   let field = "";
@@ -88,7 +93,12 @@ async function readJsonResponse(response) {
 }
 
 async function fetchFromApi() {
-  const response = await fetch(SHEET_API_URL);
+  const response = await fetch(withCacheBust(SHEET_API_URL), {
+    cache: "no-store",
+    headers: {
+      "Cache-Control": "no-cache",
+    },
+  });
   const contentType = response.headers.get("content-type") || "";
 
   if (!contentType.includes("application/json")) {
@@ -104,7 +114,7 @@ async function fetchFromCsv() {
   }
 
   const cleanUrl = SHEET_CSV_URL.replace(/\\&/g, "&").trim();
-  const response = await fetch(cleanUrl);
+  const response = await fetch(withCacheBust(cleanUrl), { cache: "no-store" });
 
   if (!response.ok) {
     throw new Error(`Google Sheet fetch failed with ${response.status}`);
@@ -144,5 +154,7 @@ export async function updateTripPayment({ name, totalGiven, pin }) {
 
   return readJsonResponse(response);
 }
+
+
 
 

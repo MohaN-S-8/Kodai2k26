@@ -1,5 +1,10 @@
 const VISITING_PLACES_API_URL = import.meta.env.VITE_VISITING_PLACES_API_URL;
 
+function withCacheBust(url) {
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}_=${Date.now()}`;
+}
+
 async function readJsonResponse(response) {
   const data = await response.json().catch(() => ({}));
 
@@ -19,7 +24,12 @@ export async function fetchVisitingPlaces() {
     throw new Error("Missing VITE_VISITING_PLACES_API_URL environment variable");
   }
 
-  const response = await fetch(VISITING_PLACES_API_URL);
+  const response = await fetch(withCacheBust(VISITING_PLACES_API_URL), {
+    cache: "no-store",
+    headers: {
+      "Cache-Control": "no-cache",
+    },
+  });
   return readJsonResponse(response);
 }
 
@@ -39,3 +49,5 @@ export async function saveVisitingPlaces({ places, pin }) {
 
   return readJsonResponse(response);
 }
+
+

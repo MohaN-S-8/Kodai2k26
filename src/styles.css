@@ -1537,3 +1537,26 @@ tbody tr.is-paid td {
     margin-bottom: 0;
   }
 }
+
+/* Mobile route connector: keep the trip path clean on deployed phones. */
+@media (max-width: 720px) {
+  .route-preview {
+    gap: 8px;
+  }
+
+  .route-point {
+    min-height: 86px;
+  }
+
+  .route-line {
+    width: 4px !important;
+    height: 58px !important;
+    justify-self: center;
+    border-radius: 999px;
+    background: #111827 !important;
+  }
+
+  .route-line span {
+    display: none !important;
+  }
+}

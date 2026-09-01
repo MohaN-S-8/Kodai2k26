@@ -71,14 +71,31 @@ function parseCsv(csvText) {
   return { columns, rows };
 }
 
-async function fetchFromApi() {
-  const response = await fetch(SHEET_API_URL);
+async function readJsonResponse(response) {
+  const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(`Trip sheet API failed with ${response.status}`);
+    if (response.status === 404 && SHEET_API_URL === "/api/sheet") {
+      throw new Error(
+        "Local payment updates need Vercel dev. Stop npm run dev and run: npx vercel dev",
+      );
+    }
+
+    throw new Error(data.error || `Request failed with ${response.status}`);
   }
 
-  return response.json();
+  return data;
+}
+
+async function fetchFromApi() {
+  const response = await fetch(SHEET_API_URL);
+  const contentType = response.headers.get("content-type") || "";
+
+  if (!contentType.includes("application/json")) {
+    throw new Error("Trip sheet API did not return JSON");
+  }
+
+  return readJsonResponse(response);
 }
 
 async function fetchFromCsv() {
@@ -99,8 +116,33 @@ async function fetchFromCsv() {
 
 export async function fetchTripSheetData() {
   if (SHEET_API_URL) {
-    return fetchFromApi();
+    try {
+      return await fetchFromApi();
+    } catch (apiError) {
+      if (!SHEET_CSV_URL) {
+        throw apiError;
+      }
+    }
   }
 
   return fetchFromCsv();
 }
+
+export async function updateTripPayment({ name, totalGiven, pin }) {
+  if (!SHEET_API_URL) {
+    throw new Error("Payment updates need VITE_TRIP_SHEET_API_URL=/api/sheet");
+  }
+
+  const response = await fetch(SHEET_API_URL, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Trip-Update-Pin": pin,
+    },
+    body: JSON.stringify({ name, totalGiven }),
+  });
+
+  return readJsonResponse(response);
+}
+
+

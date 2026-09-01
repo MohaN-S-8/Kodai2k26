@@ -1,8 +1,36 @@
-import { COMMON_COSTS, COLUMN_LABELS, MONEY_COLUMNS, BALANCE_COLUMN } from "../data/tripConfig";
+import { useEffect, useMemo, useState } from "react";
+import { BALANCE_COLUMN, COLUMN_LABELS, COMMON_COSTS, MONEY_COLUMNS } from "../data/tripConfig";
 import { createPaymentLinks, hasPaymentReceiver } from "../lib/payment";
 import { formatMoney, getMoneyNumber } from "../utils/money";
+import { normalizeName } from "../utils/names";
 
-function PaymentCard({ member }) {
+function isFullyPaid(member) {
+  return getMoneyNumber(member?.[BALANCE_COLUMN]) <= 0;
+}
+
+function PaymentCard({ error, isUpdating, member, memberRows, onUpdatePayment }) {
+const [managerName, setManagerName] = useState("");
+  const [managerAmount, setManagerAmount] = useState("");
+  const [managerPin, setManagerPin] = useState("");
+
+  const isManager = normalizeName(member?.Name) === "kalai";
+  const managerTarget = useMemo(
+    () => memberRows.find((row) => row.Name === managerName) || null,
+    [managerName, memberRows]
+  );
+
+  useEffect(() => {
+setManagerName(member?.Name || "");
+    setManagerAmount(member?.["Total given"] || "");
+    setManagerPin("");
+  }, [member]);
+
+  useEffect(() => {
+    if (managerTarget) {
+      setManagerAmount(managerTarget["Total given"] || "");
+    }
+  }, [managerTarget]);
+
   if (!member) {
     return null;
   }
@@ -13,14 +41,61 @@ function PaymentCard({ member }) {
     payerName: member.Name,
   });
   const canPay = hasPaymentReceiver() && balanceAmount > 0;
+function handleManagerSubmit(event) {
+    event.preventDefault();
+    onUpdatePayment({ name: managerName, totalGiven: managerAmount, pin: managerPin });
+  }
 
   return (
     <section className="payment-card" aria-label="Your payment balance">
-      <div>
+      <div className="payment-info">
         <p className="eyebrow">Matched from sheet</p>
         <h2>{member.Name}</h2>
         <span>Balance: Rs {formatMoney(balanceAmount)}</span>
       </div>
+
+      {isManager && (
+        <form className="payment-edit-form manager-form" onSubmit={handleManagerSubmit}>
+          <label>
+            Select name
+            <select
+              value={managerName}
+              onChange={(event) => setManagerName(event.target.value)}
+            >
+              {memberRows.map((row) => (
+                <option key={row.Name} value={row.Name}>
+                  {row.Name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Total given
+            <input
+              type="number"
+              min="0"
+              step="1"
+              value={managerAmount}
+              onChange={(event) => setManagerAmount(event.target.value)}
+              placeholder="Payment amount"
+            />
+          </label>
+          <label>
+            Update PIN
+            <input
+              type="password"
+              value={managerPin}
+              onChange={(event) => setManagerPin(event.target.value)}
+              placeholder="Trip PIN"
+            />
+          </label>
+          {error && <p className="payment-error">{error}</p>}
+          <button type="submit" disabled={isUpdating || !managerName}>
+            {isUpdating ? "Updating..." : "Update Selected"}
+          </button>
+        </form>
+      )}
+
       {canPay ? (
         <a className="payment-button" href={paymentLinks.gpay}>
           Pay Rs {formatMoney(balanceAmount)} via GPay
@@ -34,10 +109,24 @@ function PaymentCard({ member }) {
   );
 }
 
-function ExpensePanel({ displayColumns, memberRows, selectedMember, onClose }) {
+function ExpensePanel({
+  displayColumns,
+  memberRows,
+  paymentUpdateError,
+  isUpdatingPayment,
+  selectedMember,
+  onClose,
+  onUpdatePayment,
+}) {
   return (
     <>
-      <PaymentCard member={selectedMember} />
+      <PaymentCard
+        error={paymentUpdateError}
+        isUpdating={isUpdatingPayment}
+        member={selectedMember}
+        memberRows={memberRows}
+        onUpdatePayment={onUpdatePayment}
+      />
 
       <section className="summary-grid" aria-label="Common trip costs">
         {COMMON_COSTS.map((cost) => (
@@ -78,7 +167,10 @@ function ExpensePanel({ displayColumns, memberRows, selectedMember, onClose }) {
             </thead>
             <tbody>
               {memberRows.map((row, rowIndex) => (
-                <tr key={`${row.No}-${row.Name}-${rowIndex}`}>
+                <tr
+                  className={isFullyPaid(row) ? "is-paid" : ""}
+                  key={`${row.No}-${row.Name}-${rowIndex}`}
+                >
                   {displayColumns.map((column) => (
                     <td
                       className={MONEY_COLUMNS.has(column) ? "money" : ""}
@@ -100,3 +192,4 @@ function ExpensePanel({ displayColumns, memberRows, selectedMember, onClose }) {
 }
 
 export default ExpensePanel;
+

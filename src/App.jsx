@@ -6,7 +6,7 @@ import NamePromptModal from "./components/NamePromptModal";
 import TripLoader from "./components/TripLoader";
 import TripMap from "./components/TripMap";
 import { BALANCE_COLUMN, PREFERRED_COLUMNS } from "./data/tripConfig";
-import { fetchTripSheetData } from "./lib/googleSheet";
+import { fetchTripSheetData, updateTripPayment } from "./lib/googleSheet";
 import { findMemberByName, isNumber } from "./utils/names";
 import { getMoneyNumber } from "./utils/money";
 
@@ -20,6 +20,8 @@ function App() {
   const [isNamePromptOpen, setIsNamePromptOpen] = useState(false);
   const [nameError, setNameError] = useState("");
   const [selectedMember, setSelectedMember] = useState(null);
+  const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
+  const [paymentUpdateError, setPaymentUpdateError] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -80,6 +82,41 @@ function App() {
   function openExpenseNamePrompt() {
     setNameError("");
     setIsNamePromptOpen(true);
+  }
+
+  function applySheetData(data, currentMemberName = selectedMember?.Name) {
+    const nextRows = data.rows;
+    const nextMemberRows = nextRows.filter((row) => isNumber(row.No) && row.Name);
+
+    setColumns(data.columns);
+    setRows(nextRows);
+
+    if (currentMemberName) {
+      setSelectedMember(findMemberByName(nextMemberRows, currentMemberName));
+    }
+  }
+
+  async function handlePaymentUpdate({ name, totalGiven, pin }) {
+    const targetName = name || selectedMember?.Name;
+
+    if (!targetName) {
+      return;
+    }
+
+    try {
+      setIsUpdatingPayment(true);
+      setPaymentUpdateError("");
+      const data = await updateTripPayment({
+        name: targetName,
+        totalGiven,
+        pin,
+      });
+      applySheetData(data, selectedMember?.Name);
+    } catch (updateError) {
+      setPaymentUpdateError(updateError.message);
+    } finally {
+      setIsUpdatingPayment(false);
+    }
   }
 
   function handleNameSubmit(name) {
@@ -143,6 +180,9 @@ function App() {
           memberRows={memberRows}
           selectedMember={selectedMember}
           onClose={returnHome}
+          onUpdatePayment={handlePaymentUpdate}
+          isUpdatingPayment={isUpdatingPayment}
+          paymentUpdateError={paymentUpdateError}
         />
       )}
 
@@ -158,3 +198,5 @@ function App() {
 }
 
 export default App;
+
+

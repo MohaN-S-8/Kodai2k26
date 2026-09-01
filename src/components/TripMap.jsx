@@ -1,6 +1,5 @@
-const STAY_MAP_URL = "https://maps.app.goo.gl/7YxBZBgb9ALJRVsr9";
-const STAY_EMBED_URL =
-  "https://www.google.com/maps?q=Zion%20Elite%20Residency%2C%20Kodaikanal&output=embed";
+const STAY_MAP_URL = import.meta.env.VITE_STAY_MAP_URL || "";
+const STAY_EMBED_URL = import.meta.env.VITE_STAY_EMBED_URL || "";
 
 function TripMap() {
   return (
@@ -28,3 +27,5 @@ function TripMap() {
 }
 
 export default TripMap;
+
+

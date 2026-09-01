@@ -1,4 +1,4 @@
-const ROUTE_MAP_URL = "https://maps.app.goo.gl/BAFe7F63BUyFmMYn9";
+const ROUTE_MAP_URL = import.meta.env.VITE_ROUTE_MAP_URL || "";
 
 function TravelRoute() {
   return (
@@ -51,6 +51,7 @@ function TravelRoute() {
 }
 
 export default TravelRoute;
+
 
 
 

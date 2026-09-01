@@ -3,8 +3,8 @@ import { createSign } from "node:crypto";
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const SHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets";
 const CSV_URL = process.env.TRIP_SHEET_CSV_URL || process.env.VITE_TRIP_SHEET_CSV_URL;
-const SPREADSHEET_ID = process.env.GOOGLE_SHEET_SPREADSHEET_ID || "1LOM6iBG9n07kB_qSN4BdtNSOtohc115BY-zTs-gWfhQ";
-const SHEET_GID = process.env.GOOGLE_SHEET_GID || "769666126";
+const SPREADSHEET_ID = process.env.GOOGLE_SHEET_SPREADSHEET_ID;
+const SHEET_GID = process.env.GOOGLE_SHEET_GID;
 const SHEET_NAME = process.env.GOOGLE_SHEET_NAME;
 const UPDATE_PIN = process.env.TRIP_UPDATE_PIN;
 
@@ -171,6 +171,12 @@ function columnLetter(columnIndex) {
   return letters;
 }
 
+function assertSpreadsheetConfig() {
+  if (!SPREADSHEET_ID) {
+    throw new Error("Missing GOOGLE_SHEET_SPREADSHEET_ID environment variable");
+  }
+}
+
 async function sheetsRequest(path, options = {}) {
   const accessToken = await getAccessToken();
   const apiResponse = await fetch(
@@ -335,3 +341,5 @@ export default async function handler(request, response) {
     });
   }
 }
+
+

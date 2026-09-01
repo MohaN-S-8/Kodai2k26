@@ -1,5 +1,6 @@
 const PAYMENT_UPI_ID = import.meta.env.VITE_PAYMENT_UPI_ID || "";
-const PAYMENT_PAYEE_NAME = import.meta.env.VITE_PAYMENT_PAYEE_NAME || "Kodai Trip";
+const PAYMENT_PAYEE_NAME = import.meta.env.VITE_PAYMENT_PAYEE_NAME || "";
+const PAYMENT_NOTE_PREFIX = import.meta.env.VITE_PAYMENT_NOTE_PREFIX || "Trip payment from";
 
 function createUpiParams({ amount, payerName }) {
   const params = new URLSearchParams({
@@ -7,7 +8,7 @@ function createUpiParams({ amount, payerName }) {
     pn: PAYMENT_PAYEE_NAME,
     am: String(amount),
     cu: "INR",
-    tn: `Kodai trip balance from ${payerName}`,
+    tn: `${PAYMENT_NOTE_PREFIX} ${payerName}`,
   });
 
   return params.toString();
@@ -25,3 +26,5 @@ export function createPaymentLinks({ amount, payerName }) {
     upi: `upi://pay?${params}`,
   };
 }
+
+

@@ -18,6 +18,12 @@ export const VISITING_PLACES = [
     note: "Short valley-view walk, best when the mist behaves.",
   },
   {
+    id: "guna-cave",
+    name: "Guna Cave",
+    cost: "Rs 10 approx",
+    note: "Famous cave viewpoint stop; check crowd and opening status before going.",
+  },
+  {
     id: "pillar-rocks",
     name: "Pillar Rocks",
     cost: "Rs 10 approx",
@@ -48,3 +54,5 @@ export const VISITING_PLACES = [
     note: "Scenic village stop after Kodaikanal.",
   },
 ];
+
+

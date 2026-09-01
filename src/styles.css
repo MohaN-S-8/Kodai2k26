@@ -510,7 +510,8 @@ h2 {
 .payment-edit-form input,
 .payment-edit-form select,
 .name-modal input,
-.visiting-pin-form input {
+.visiting-pin-form input,
+.add-place-form input {
   width: 100%;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
@@ -529,7 +530,8 @@ h2 {
 .payment-edit-form input:focus,
 .payment-edit-form select:focus,
 .name-modal input:focus,
-.visiting-pin-form input:focus {
+.visiting-pin-form input:focus,
+.add-place-form input:focus {
   border-color: #0d7c66;
   outline: 3px solid rgba(13, 124, 102, 0.18);
 }
@@ -595,7 +597,8 @@ h2 {
   text-transform: uppercase;
 }
 
-.visiting-pin-form {
+.visiting-pin-form,
+.add-place-form {
   display: grid;
   grid-template-columns: minmax(160px, 1fr) auto;
   align-items: end;
@@ -607,7 +610,13 @@ h2 {
   padding: 14px;
 }
 
-.visiting-pin-form label {
+.add-place-form {
+  grid-template-columns: minmax(150px, 1fr) minmax(120px, 0.75fr) minmax(180px, 1.2fr) auto;
+  background: #f8fafc;
+}
+
+.visiting-pin-form label,
+.add-place-form label {
   display: grid;
   gap: 6px;
   color: #536072;
@@ -616,7 +625,8 @@ h2 {
   text-transform: uppercase;
 }
 
-.visiting-pin-form button {
+.visiting-pin-form button,
+.add-place-form button {
   border: 1px solid #111827;
   border-radius: 8px;
   background: #111827;
@@ -628,13 +638,16 @@ h2 {
 }
 
 .visiting-pin-form button:hover,
-.visiting-pin-form button:focus-visible {
+.visiting-pin-form button:focus-visible,
+.add-place-form button:hover,
+.add-place-form button:focus-visible {
   background: #0d7c66;
   border-color: #0d7c66;
   outline: none;
 }
 
-.visiting-pin-form button:disabled {
+.visiting-pin-form button:disabled,
+.add-place-form button:disabled {
   cursor: not-allowed;
   opacity: 0.72;
 }
@@ -658,6 +671,10 @@ h2 {
   cursor: pointer;
   padding: 16px;
   box-shadow: 0 12px 36px rgba(18, 25, 38, 0.06);
+}
+
+.visiting-place:has(.delete-place-button) {
+  grid-template-columns: 24px 1fr auto;
 }
 
 .visiting-place input {
@@ -1222,6 +1239,10 @@ tbody tr.is-paid td {
     min-width: 760px;
   }
 }
+
+
+
+
 
 
 

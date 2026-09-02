@@ -15,13 +15,13 @@ function ActionMenu({ activeView, onOpenExpenses, onOpenVisiting, onOpenFood }) 
       >
         Visiting places
       </button>
-      <button
+      {/* <button
         className={`menu-option ${activeView === "food" ? "is-active" : ""}`}
         type="button"
         onClick={onOpenFood}
       >
         Food Expense
-      </button>
+      </button> */}
     </section>
   );
 }

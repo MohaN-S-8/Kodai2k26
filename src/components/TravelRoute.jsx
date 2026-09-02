@@ -8,12 +8,20 @@ function TravelRoute() {
           <p className="eyebrow">Travel route</p>
           <h2>Chennai to Kodaikanal to Poomparai</h2>
         </div>
-        <a className="map-link-button" href={ROUTE_MAP_URL} target="_blank" rel="noreferrer">
+        <a
+          className="map-link-button"
+          href={ROUTE_MAP_URL}
+          target="_blank"
+          rel="noreferrer"
+        >
           Open Route
         </a>
       </div>
 
-      <div className="route-preview" aria-label="Chennai to Kodaikanal to Poomparai route preview">
+      <div
+        className="route-preview"
+        aria-label="Chennai to Kodaikanal to Poomparai route preview"
+      >
         <div className="route-point route-start">
           <span>Start</span>
           <strong>Chennai</strong>
@@ -41,9 +49,21 @@ function TravelRoute() {
       <div className="route-road" aria-hidden="true">
         <div className="route-dashes" />
         <div className="route-rider-pack">
-          <img className="route-rider" src="/images/trip-rider.png" alt="" loading="lazy" decoding="async" />
-          <p>Tour na enaku nee than vathiyare...</p>
-          <img className="route-van" src="/images/route-van.svg" alt="" loading="lazy" decoding="async" />
+          <img
+            className="route-rider"
+            src="/images/trip-rider.png"
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
+          <p>Nee vaa vathiyare namma cycle la tour povom..</p>
+          <img
+            className="route-van"
+            src="/images/route-van.svg"
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
         </div>
       </div>
     </section>

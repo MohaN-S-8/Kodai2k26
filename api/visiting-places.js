@@ -10,15 +10,19 @@ const UPDATE_PIN = process.env.TRIP_UPDATE_PIN;
 const HEADERS = ["id", "name", "cost", "note", "visited", "custom"];
 
 const DEFAULT_PLACES = [
-  { id: "kodaikanal-lake", name: "Kodaikanal Lake", cost: "Free", note: "Boating or cycle rental is optional and can stay within Rs 500.", visited: false, custom: false },
-  { id: "bryant-park", name: "Bryant Park", cost: "Rs 30 approx", note: "Good easy stop near the lake.", visited: false, custom: false },
-  { id: "coakers-walk", name: "Coaker's Walk", cost: "Rs 20-30 approx", note: "Short valley-view walk, best when the mist behaves.", visited: false, custom: false },
-  { id: "guna-cave", name: "Guna Cave", cost: "Rs 10 approx", note: "Famous cave viewpoint stop; check crowd and opening status before going.", visited: false, custom: false },
-  { id: "pillar-rocks", name: "Pillar Rocks", cost: "Rs 10 approx", note: "Classic viewpoint stop on the Kodai side.", visited: false, custom: false },
-  { id: "green-valley-view", name: "Green Valley View", cost: "Rs 10 approx", note: "Quick viewpoint stop, usually easy to pair with Pillar Rocks.", visited: false, custom: false },
-  { id: "silver-cascade-falls", name: "Silver Cascade Falls", cost: "Free", note: "Good arrival-side waterfall photo stop.", visited: false, custom: false },
-  { id: "dolphins-nose", name: "Dolphin's Nose", cost: "Free", note: "Viewpoint trek stop; go only if the group has energy left.", visited: false, custom: false },
-  { id: "poomparai-village", name: "Poomparai Village", cost: "Free", note: "Scenic village stop after Kodaikanal.", visited: false, custom: false },
+  { id: "kodaikanal-lake", name: "Kodaikanal Lake", cost: "Free", note: "Kodaikanal, Tamil Nadu 624101.", visited: false, custom: false },
+  { id: "bryant-park", name: "Bryant Park", cost: "Rs 30 approx", note: "6FJV+H7W, Lower Shola Rd, Kodaikanal, Tamil Nadu 624101.", visited: false, custom: false },
+  { id: "coakers-walk", name: "Coaker's Walk", cost: "Rs 20-30 approx", note: "Kodaikanal, Tamil Nadu 624101.", visited: false, custom: false },
+  { id: "guna-cave", name: "Guna Cave", cost: "Rs 10 approx", note: "Pillar Rocks Rd, Kodaikanal, Vellagavi, Tamil Nadu 624103.", visited: false, custom: false },
+  { id: "pillar-rocks", name: "Pillar Rocks", cost: "Rs 10 approx", note: "Pillar Rocks Rd, Tamil Nadu 624103.", visited: false, custom: false },
+  { id: "pine-forest", name: "Pine Forest", cost: "Free", note: "6F75+FG4, Lake Rd, Berijam, Kodaikanal, Tamil Nadu 624103.", visited: false, custom: false },
+  { id: "moir-point", name: "Moir Point", cost: "Free", note: "6C6X+57V, Ten Mile Round, Poombarai, Tamil Nadu 624103.", visited: false, custom: false },
+  { id: "solar-observatory-museum", name: "Kodaikanal Solar Observatory Museum Block", cost: "Under Rs 500", note: "6FJ8+V5C, Poombarai, Tamil Nadu 624103.", visited: false, custom: false },
+  { id: "fairy-falls", name: "Fairy Falls", cost: "Free", note: "6FF8+FQH, Fairy Falls Rd, Kodaikanal, Tamil Nadu 624103.", visited: false, custom: false },
+  { id: "zion-elite-residency", name: "Zion Elite Residency", cost: "Stay", note: "Misty Mountains, 500N, Chinnapalam Road, Naidupuram, Vilpatti, Tamil Nadu 624101.", visited: false, custom: false },
+  { id: "poombarai", name: "Poombarai", cost: "Free", note: "Poombarai, Tamil Nadu.", visited: false, custom: false },
+  { id: "poombarai-view-point", name: "Poombarai View Point", cost: "Free", note: "7C25+J55, Mannavanur to Kodaikanal Rd, Poombarai, Tamil Nadu 624103.", visited: false, custom: false },
+  { id: "perumbakkam-main-road", name: "Perumbakkam Main Rd", cost: "Free", note: "Perumbakkam Main Rd, Tamil Nadu.", visited: false, custom: false },
 ];
 
 function base64Url(value) {
@@ -118,6 +122,15 @@ function cleanPlace(place) {
   };
 }
 
+function mergeDefaultPlaces(places) {
+  const normalizedPlaces = places.map(cleanPlace);
+  const placesById = new Map(normalizedPlaces.map((place) => [place.id, place]));
+  const defaultIds = new Set(DEFAULT_PLACES.map((place) => place.id));
+  const defaultPlaces = DEFAULT_PLACES.map((place) => ({ ...place, visited: Boolean(placesById.get(place.id)?.visited) }));
+  const customPlaces = normalizedPlaces.filter((place) => place.custom && !defaultIds.has(place.id));
+
+  return [...defaultPlaces, ...customPlaces];
+}
 function rowsToPlaces(rows) {
   return rows.map((row) => cleanPlace({ id: row[0], name: row[1], cost: row[2], note: row[3], visited: toBool(row[4]), custom: toBool(row[5]) })).filter((place) => place.id && place.name);
 }
@@ -139,7 +152,13 @@ async function readFromSheetsApi() {
     return { places: DEFAULT_PLACES };
   }
 
-  return { places };
+  const mergedPlaces = mergeDefaultPlaces(places);
+
+  if (JSON.stringify(placesToRows(mergedPlaces)) !== JSON.stringify(placesToRows(places))) {
+    await writePlacesToSheetsApi(mergedPlaces);
+  }
+
+  return { places: mergedPlaces };
 }
 
 async function writePlacesToSheetsApi(places) {
@@ -170,7 +189,8 @@ async function readFromCsv() {
     return { places: DEFAULT_PLACES };
   }
 
-  return parseCsv(await sheetResponse.text());
+  const data = parseCsv(await sheetResponse.text());
+  return data.places.length ? { places: mergeDefaultPlaces(data.places) } : { places: DEFAULT_PLACES };
 }
 
 async function readPlaces() {
@@ -228,9 +248,3 @@ export default async function handler(request, response) {
     response.status(error.statusCode || 500).json({ error: error.message || "Visiting places request failed" });
   }
 }
-
-
-
-
-
-

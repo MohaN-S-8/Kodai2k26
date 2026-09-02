@@ -1,7 +1,8 @@
 :root {
+  --trip-font: "Skranji", system-ui, sans-serif;
   color: #18202f;
   background: #f7f8fb;
-  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  font-family: var(--trip-font);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -14,7 +15,7 @@ html {
 
 * {
   box-sizing: border-box;
-  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  font-family: var(--trip-font);
 }
 
 body {
@@ -29,7 +30,7 @@ button,
 input,
 textarea,
 select {
-  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  font-family: var(--trip-font);
 }
 
 button,
@@ -353,7 +354,7 @@ tbody tr {
 }
 
 .route-point span {
-  color: #536072;
+  color: #000000;
   font-size: 0.78rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -449,17 +450,17 @@ tbody tr {
 .route-van {
   width: min(280px, 28vw);
   height: auto;
-  margin: 0 0 28px 6px;
+  margin: 0 0 28px 275px;
   object-fit: contain;
   transform: scaleX(-1);
   filter: drop-shadow(0 10px 10px rgba(17, 24, 39, 0.18));
 }
 
 .route-rider-pack p {
-  max-width: min(44vw, 620px);
-  margin: 0 0 34px;
+  max-width: min(44vw, 830px);
+  margin: 0 0 64px;
   border-radius: 999px;
-  background: rgba(17, 24, 39, 0.72);
+  /* background: rgba(17, 24, 39, 0.72); */
   color: #ffffff;
   font-size: clamp(1.05rem, 2.8vw, 2.35rem);
   font-weight: 900;
@@ -656,7 +657,7 @@ tbody tr {
 
 .summary-card p {
   margin: 0 0 10px;
-  color: #22272e;
+  color: #08090a;
   font-size: 0.85rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -730,7 +731,7 @@ th {
 }
 
 td {
-  color: #06080a;
+  color: #000000;
   font-size:1.09rem;
 }
 
@@ -887,6 +888,133 @@ tbody tr.is-paid td,
     minmax(150px, 1fr) minmax(120px, 0.75fr) minmax(180px, 1.2fr)
     auto;
 }
+.visiting-route-list {
+  display: grid;
+  gap: 16px;
+}
+
+.visiting-route-group {
+  display: grid;
+  gap: 0;
+}
+
+.visiting-route-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px 0;
+}
+
+.visiting-route-heading p {
+  margin: 0 0 4px;
+  color: #000000;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.visiting-route-heading strong {
+  color: #101828;
+  font-size: clamp(1.2rem, 3vw, 1.75rem);
+}
+
+.map-route-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid #111827;
+  border-radius: 8px;
+  background: #111827;
+  color: #ffffff;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 14px 30px rgba(17, 24, 39, 0.16);
+}
+
+.map-route-button:hover,
+.map-route-button:focus-visible {
+  background: #210f37;
+  border-color: #210f37;
+  color: #ffffff;
+  outline: none;
+}
+
+
+
+.visiting-map-panel {
+  height: clamp(260px, 42vh, 460px);
+  margin: 16px 18px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+}
+
+.visiting-map-panel iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+
+
+
+.places-real-map {
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+}
+
+.place-leaflet-pin {
+  background: transparent;
+  border: 0;
+}
+
+.place-leaflet-pin span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 3px solid #ffffff;
+  border-radius: 999px;
+  background: #d92d20;
+  color: #ffffff;
+  font-family: var(--trip-font);
+  font-size: 0.9rem;
+  font-weight: 900;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.28);
+}
+
+.place-leaflet-label {
+  border: 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #101828;
+  font-family: var(--trip-font);
+  font-weight: 800;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.16);
+}
+
+.place-leaflet-label::before {
+  display: none;
+}
+
+.route-map-error {
+  display: grid;
+  place-content: center;
+  height: 100%;
+  gap: 6px;
+  padding: 24px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.76);
+  color: #101828;
+}
 
 .visiting-grid {
   display: grid;
@@ -978,7 +1106,8 @@ tbody tr.is-paid td,
   opacity: 0.78;
 }
 
-.place-actions {
+
+  .place-actions {
   display: grid;
   align-content: start;
   gap: 8px;
@@ -994,6 +1123,30 @@ tbody tr.is-paid td,
   font-size: 0.82rem;
 }
 
+.map-place-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #111827;
+  border-radius: 8px;
+  background: #111827;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 10px 12px;
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.map-place-button:hover,
+.map-place-button:focus-visible {
+  background: #210f37;
+  border-color: #210f37;
+  color: #ffffff;
+  outline: none;
+}
 /* States, modal, and toast */
 .state-panel {
   display: grid;
@@ -1326,7 +1479,11 @@ tbody tr.is-paid td,
 }
 
 @media (min-width: 901px) {
-  .visiting-grid {
+
+
+
+
+.visiting-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
@@ -1354,7 +1511,11 @@ tbody tr.is-paid td,
 }
 
 @media (min-width: 721px) and (max-width: 900px) {
-  .visiting-grid {
+
+
+
+
+.visiting-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1394,6 +1555,21 @@ tbody tr.is-paid td,
 }
 
 @media (max-width: 720px) {
+  .visiting-route-heading {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 14px 12px 0;
+  }
+
+  .map-route-button {
+    width: 100%;
+  }
+
+  .visiting-map-panel {
+    height: 320px;
+    margin: 14px 12px 4px;
+  }
+
   .page-shell {
     width: min(100% - 20px, 1180px);
     padding: 22px 0;

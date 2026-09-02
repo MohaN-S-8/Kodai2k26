@@ -14,6 +14,10 @@ const DEFAULT_FOOD_EXPENSES = [
   { id: "day-1-lunch", day: "Day 1", meal: "Lunch", amount: 0, paidNames: [] },
   { id: "day-1-dinner", day: "Day 1", meal: "Dinner", amount: 0, paidNames: [] },
   { id: "day-1-snacks", day: "Day 1", meal: "Snacks", amount: 0, paidNames: [] },
+  { id: "day-2-breakfast", day: "Day 2", meal: "Breakfast", amount: 0, paidNames: [] },
+  { id: "day-2-lunch", day: "Day 2", meal: "Lunch", amount: 0, paidNames: [] },
+  { id: "day-2-dinner", day: "Day 2", meal: "Dinner", amount: 0, paidNames: [] },
+  { id: "day-2-snacks", day: "Day 2", meal: "Snacks", amount: 0, paidNames: [] },
 ];
 
 function base64Url(value) {
@@ -118,6 +122,15 @@ function cleanExpense(expense) {
   };
 }
 
+function mergeDefaultExpenses(expenses) {
+  const normalizedExpenses = expenses.map(cleanExpense);
+  const expensesById = new Map(normalizedExpenses.map((expense) => [expense.id, expense]));
+  const defaultIds = new Set(DEFAULT_FOOD_EXPENSES.map((expense) => expense.id));
+  const defaultExpenses = DEFAULT_FOOD_EXPENSES.map((expense) => expensesById.get(expense.id) || expense);
+  const extraExpenses = normalizedExpenses.filter((expense) => !defaultIds.has(expense.id));
+
+  return [...defaultExpenses, ...extraExpenses];
+}
 function rowsToExpenses(rows) {
   return rows
     .map((row) => cleanExpense({ id: row[0], day: row[1], meal: row[2], amount: row[3], paidNames: row[4] }))
@@ -144,7 +157,13 @@ async function readFromSheetsApi() {
     return { expenses: DEFAULT_FOOD_EXPENSES };
   }
 
-  return { expenses };
+  const mergedExpenses = mergeDefaultExpenses(expenses);
+
+  if (mergedExpenses.length !== expenses.length) {
+    await writeExpensesToSheetsApi(mergedExpenses);
+  }
+
+  return { expenses: mergedExpenses };
 }
 
 async function writeExpensesToSheetsApi(expenses) {
@@ -179,7 +198,7 @@ async function readFromCsv() {
   }
 
   const data = parseCsv(await sheetResponse.text());
-  return data.expenses.length ? data : { expenses: DEFAULT_FOOD_EXPENSES };
+  return data.expenses.length ? { expenses: mergeDefaultExpenses(data.expenses) } : { expenses: DEFAULT_FOOD_EXPENSES };
 }
 
 async function readExpenses() {

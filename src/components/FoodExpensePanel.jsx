@@ -21,12 +21,16 @@ const DEFAULT_FOOD_EXPENSES = [
   { id: "day-1-lunch", day: "Day 1", meal: "Lunch", amount: 0, paidNames: [] },
   { id: "day-1-dinner", day: "Day 1", meal: "Dinner", amount: 0, paidNames: [] },
   { id: "day-1-snacks", day: "Day 1", meal: "Snacks", amount: 0, paidNames: [] },
+  { id: "day-2-breakfast", day: "Day 2", meal: "Breakfast", amount: 0, paidNames: [] },
+  { id: "day-2-lunch", day: "Day 2", meal: "Lunch", amount: 0, paidNames: [] },
+  { id: "day-2-dinner", day: "Day 2", meal: "Dinner", amount: 0, paidNames: [] },
+  { id: "day-2-snacks", day: "Day 2", meal: "Snacks", amount: 0, paidNames: [] },
 ];
 
 function getStoredExpenses() {
   try {
     const parsed = JSON.parse(window.localStorage.getItem(FOOD_STORAGE_KEY) || "[]");
-    return Array.isArray(parsed) && parsed.length ? parsed.map(normalizeExpense) : DEFAULT_FOOD_EXPENSES;
+    return Array.isArray(parsed) && parsed.length ? mergeDefaultExpenses(parsed) : DEFAULT_FOOD_EXPENSES;
   } catch {
     return DEFAULT_FOOD_EXPENSES;
   }
@@ -51,6 +55,15 @@ function normalizeExpense(expense) {
   };
 }
 
+function mergeDefaultExpenses(expenses) {
+  const normalizedExpenses = expenses.map(normalizeExpense);
+  const expensesById = new Map(normalizedExpenses.map((expense) => [expense.id, expense]));
+  const defaultIds = new Set(DEFAULT_FOOD_EXPENSES.map((expense) => expense.id));
+  const defaultExpenses = DEFAULT_FOOD_EXPENSES.map((expense) => expensesById.get(expense.id) || expense);
+  const extraExpenses = normalizedExpenses.filter((expense) => !defaultIds.has(expense.id));
+
+  return [...defaultExpenses, ...extraExpenses];
+}
 function buildUpiLink({ name, amount }) {
   if (!PAYMENT_UPI_ID || amount <= 0) {
     return "";
@@ -94,7 +107,7 @@ function FoodExpensePanel({ memberRows, onClose, onToast }) {
         const data = await fetchFoodExpenses();
 
         if (!cancelled && Array.isArray(data.expenses)) {
-          const nextExpenses = data.expenses.map(normalizeExpense);
+          const nextExpenses = mergeDefaultExpenses(data.expenses);
           setExpenses(nextExpenses);
           setDraftAmounts(Object.fromEntries(nextExpenses.map((expense) => [expense.id, String(expense.amount || "")])));
         }
@@ -257,7 +270,7 @@ function FoodExpensePanel({ memberRows, onClose, onToast }) {
       <div className="table-heading">
         <div>
           <p className="eyebrow">Food expense</p>
-          <h2>Day 1 food split</h2>
+          <h2>2 days food split</h2>
         </div>
         <div className="table-actions">
           <span>{isSyncing ? "Syncing..." : `Rs ${formatMoney(totalFoodAmount)} total`}</span>

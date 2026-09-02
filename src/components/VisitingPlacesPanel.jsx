@@ -1,10 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { VISITING_PLACES } from "../data/visitingPlaces";
 import { fetchVisitingPlaces, saveVisitingPlaces } from "../lib/visitingPlaces";
 
 const CUSTOM_PLACES_KEY = "Kodaikanal-custom-visiting-places";
 const STORAGE_KEY = "Kodaikanal-visiting-places";
 const VISITING_UPDATE_PIN = import.meta.env.VITE_TRIP_UPDATE_PIN || "";
+const VISITING_DAY_1_ROUTE_URL = import.meta.env.VITE_VISITING_DAY_1_ROUTE_URL || "https://maps.app.goo.gl/jRa5ooB2pMXLodjPA";
+const VISITING_DAY_2_ROUTE_URL = import.meta.env.VITE_VISITING_DAY_2_ROUTE_URL || "https://maps.app.goo.gl/VHZWKhNDmx4wJVKCA";
+const LEAFLET_CSS_URL = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+const LEAFLET_JS_URL = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
 const VISITING_REFRESH_INTERVAL_MS = Math.max(
   Number(
     import.meta.env.VITE_VISITING_PLACES_REFRESH_INTERVAL_MS ||
@@ -14,6 +18,172 @@ const VISITING_REFRESH_INTERVAL_MS = Math.max(
   5000,
 );
 
+const VISITING_ROUTE_DAYS = [
+  {
+    id: "day-1",
+    title: "Day 1",
+    subtitle: "Kodaikanal local route",
+    mapUrl: VISITING_DAY_1_ROUTE_URL,
+    mapCoordinates: [
+      [10.2389, 77.4892],
+      [10.2358, 77.4929],
+      [10.235, 77.4947],
+      [10.2202, 77.4672],
+      [10.2139, 77.4642],
+      [10.231, 77.4759],
+      [10.2427, 77.4278],
+      [10.2386, 77.466],
+      [10.2362, 77.472],
+    ],
+    placeIds: [
+      "kodaikanal-lake",
+      "bryant-park",
+      "coakers-walk",
+      "guna-cave",
+      "pillar-rocks",
+      "pine-forest",
+      "moir-point",
+      "solar-observatory-museum",
+      "fairy-falls",
+    ],
+  },
+  {
+    id: "day-2",
+    title: "Day 2",
+    subtitle: "Stay to Poomparai route",
+    mapUrl: VISITING_DAY_2_ROUTE_URL,
+    mapCoordinates: [
+      [10.2604, 77.4958],
+      [10.244, 77.3648],
+      [10.2514, 77.4055],
+      [10.273, 77.349],
+    ],
+    placeIds: [
+      "zion-elite-residency",
+      "poombarai",
+      "poombarai-view-point",
+      "perumbakkam-main-road",
+    ],
+  },
+];
+function loadLeaflet() {
+  if (window.L) {
+    return Promise.resolve(window.L);
+  }
+
+  const existingLink = document.querySelector(`link[href="${LEAFLET_CSS_URL}"]`);
+  if (!existingLink) {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = LEAFLET_CSS_URL;
+    document.head.appendChild(link);
+  }
+
+  const existingScript = document.querySelector(`script[src="${LEAFLET_JS_URL}"]`);
+  if (existingScript) {
+    return new Promise((resolve, reject) => {
+      existingScript.addEventListener("load", () => resolve(window.L), { once: true });
+      existingScript.addEventListener("error", reject, { once: true });
+    });
+  }
+
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = LEAFLET_JS_URL;
+    script.async = true;
+    script.onload = () => resolve(window.L);
+    script.onerror = reject;
+    document.body.appendChild(script);
+  });
+}
+
+function RouteMap({ routeDay }) {
+  const mapRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+  const [mapError, setMapError] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function renderMap() {
+      try {
+        const L = await loadLeaflet();
+        if (cancelled || !mapRef.current) {
+          return;
+        }
+
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.remove();
+        }
+
+        const coordinates = routeDay.routeStops.map((stop) => stop.coordinate).filter(Boolean);
+        const map = L.map(mapRef.current, {
+          zoomControl: true,
+          scrollWheelZoom: false,
+        });
+        mapInstanceRef.current = map;
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          maxZoom: 19,
+          attribution: "&copy; OpenStreetMap contributors",
+        }).addTo(map);
+
+        const bounds = L.latLngBounds(coordinates);
+
+        routeDay.routeStops.forEach((stop, index) => {
+          if (!stop.coordinate) {
+            return;
+          }
+
+          const marker = L.marker(stop.coordinate, {
+            icon: L.divIcon({
+              className: "place-leaflet-pin",
+              html: `<span>${index + 1}</span>`,
+              iconSize: [34, 34],
+              iconAnchor: [17, 17],
+            }),
+          }).addTo(map);
+          marker.bindTooltip(stop.place.name, {
+            permanent: true,
+            direction: "top",
+            offset: [0, -18],
+            className: "place-leaflet-label",
+          });
+        });
+
+        map.fitBounds(bounds, {
+          padding: [34, 34],
+          maxZoom: 14,
+        });
+      } catch {
+        if (!cancelled) {
+          setMapError(true);
+        }
+      }
+    }
+
+    renderMap();
+
+    return () => {
+      cancelled = true;
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, [routeDay]);
+
+  if (mapError) {
+    return (
+      <div className="route-map-error">
+        <strong>Map could not load</strong>
+        <span>Use Show on map to open the full route.</span>
+      </div>
+    );
+  }
+
+  return <div className="places-real-map" ref={mapRef} />;
+}
 function getStoredArray(key) {
   try {
     const value = window.localStorage.getItem(key);
@@ -43,6 +213,18 @@ function normalizePlace(place) {
   };
 }
 
+function mergeDefaultPlaces(places) {
+  const normalizedPlaces = places.map(normalizePlace);
+  const placesById = new Map(normalizedPlaces.map((place) => [place.id, place]));
+  const defaultIds = new Set(VISITING_PLACES.map((place) => place.id));
+  const defaultPlaces = VISITING_PLACES.map((place) => ({
+    ...normalizePlace(place),
+    visited: Boolean(placesById.get(place.id)?.visited),
+  }));
+  const customPlaces = normalizedPlaces.filter((place) => place.custom && !defaultIds.has(place.id));
+
+  return [...defaultPlaces, ...customPlaces];
+}
 function getFallbackPlaces() {
   const visitedIds = getStoredArray(STORAGE_KEY);
   const customPlaces = getStoredArray(CUSTOM_PLACES_KEY).map(normalizePlace);
@@ -76,7 +258,7 @@ function VisitingPlacesPanel({ onClose, onToast }) {
         const data = await fetchVisitingPlaces();
 
         if (!cancelled && Array.isArray(data.places)) {
-          setPlaces(data.places.map(normalizePlace));
+          setPlaces(mergeDefaultPlaces(data.places));
         }
       } catch (error) {
         if (!cancelled && !silent) {
@@ -118,6 +300,27 @@ function VisitingPlacesPanel({ onClose, onToast }) {
     [places]
   );
   const isEditing = Boolean(editingPlaceId);
+  const routeGroups = useMemo(() => {
+    const placesById = new Map(places.map((place) => [place.id, place]));
+    return VISITING_ROUTE_DAYS.map((routeDay) => ({
+      ...routeDay,
+      routeStops: routeDay.placeIds.map((placeId, index) => ({
+        place: placesById.get(placeId),
+        coordinate: routeDay.mapCoordinates[index],
+      })).filter((stop) => stop.place),
+    })).map((routeDay) => ({
+      ...routeDay,
+      places: routeDay.routeStops.map((stop) => stop.place),
+    })).filter((routeDay) => routeDay.places.length > 0);
+  }, [places]);
+  const groupedPlaceIds = useMemo(
+    () => new Set(VISITING_ROUTE_DAYS.flatMap((routeDay) => routeDay.placeIds)),
+    [],
+  );
+  const extraPlaces = useMemo(
+    () => places.filter((place) => !groupedPlaceIds.has(place.id)),
+    [groupedPlaceIds, places],
+  );
 
   async function syncPlaces(nextPlaces, successMessage) {
     setPlaces(nextPlaces);
@@ -127,7 +330,7 @@ function VisitingPlacesPanel({ onClose, onToast }) {
       const data = await saveVisitingPlaces({ places: nextPlaces, pin: editorPin });
 
       if (Array.isArray(data.places)) {
-        setPlaces(data.places.map(normalizePlace));
+        setPlaces(mergeDefaultPlaces(data.places));
       }
 
       onToast("success", successMessage);
@@ -352,8 +555,28 @@ function VisitingPlacesPanel({ onClose, onToast }) {
         </form>
       )}
 
-      <div className="visiting-grid">
-        {places.map((place) => (
+      <div className="visiting-route-list">
+        {routeGroups.map((routeDay) => (
+          <section className="visiting-route-group" key={routeDay.id}>
+            <div className="visiting-route-heading">
+              <div>
+                <p>{routeDay.title}</p>
+                <strong>{routeDay.subtitle}</strong>
+              </div>
+              <a
+                className="map-route-button"
+                href={routeDay.mapUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Show on map
+              </a>
+            </div>
+            <div className="visiting-map-panel" aria-label={`${routeDay.title} places map`}>
+              <RouteMap routeDay={routeDay} />
+            </div>
+            <div className="visiting-grid">
+              {routeDay.places.map((place) => (
           <label
             className={`visiting-place ${place.visited ? "is-visited" : ""} ${!isPinUnlocked ? "is-locked" : ""}`}
             key={place.id}
@@ -391,12 +614,65 @@ function VisitingPlacesPanel({ onClose, onToast }) {
               </span>
             )}
           </label>
+              ))}
+            </div>
+          </section>
         ))}
+
+        {extraPlaces.length > 0 && (
+          <section className="visiting-route-group">
+            <div className="visiting-route-heading">
+              <div>
+                <p>Extra stops</p>
+                <strong>Added by trip editor</strong>
+              </div>
+            </div>
+            <div className="visiting-grid">
+              {extraPlaces.map((place) => (
+          <label
+            className={`visiting-place ${place.visited ? "is-visited" : ""} ${!isPinUnlocked ? "is-locked" : ""}`}
+            key={place.id}
+          >
+            <input
+              type="checkbox"
+              checked={place.visited}
+              readOnly={!isPinUnlocked}
+              onChange={() => handleToggle(place)}
+            />
+            <span className="visit-check" aria-hidden="true" />
+            <span className="visit-copy">
+              <strong>{place.name}</strong>
+              <em>{place.cost}</em>
+              <small>{place.note}</small>
+            </span>
+            {isPinUnlocked && (
+              <span className="place-actions">
+                <button
+                  className="edit-place-button"
+                  type="button"
+                  aria-label={`Edit ${place.name}`}
+                  onClick={(event) => handleEditPlace(place, event)}
+                >
+                  Edit
+                </button>
+                <button
+                  className="delete-place-button"
+                  type="button"
+                  aria-label={`Delete ${place.name}`}
+                  onClick={(event) => handleDeletePlace(place, event)}
+                >
+                  Delete
+                </button>
+              </span>
+            )}
+          </label>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </section>
   );
 }
 
 export default VisitingPlacesPanel;
-
-

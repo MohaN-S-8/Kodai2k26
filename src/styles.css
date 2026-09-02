@@ -63,19 +63,31 @@ select {
 
 .trip-bg-route {
   background-image:
-    linear-gradient(180deg, rgba(247, 250, 252, 0.24), rgba(232, 241, 234, 0.24)),
+    linear-gradient(
+      180deg,
+      rgba(247, 250, 252, 0.24),
+      rgba(232, 241, 234, 0.24)
+    ),
     url("/images/bg-1.jpg");
 }
 
 .trip-bg-stay {
   background-image:
-    linear-gradient(180deg, rgba(247, 250, 252, 0.24), rgba(232, 241, 234, 0.24)),
+    linear-gradient(
+      180deg,
+      rgba(247, 250, 252, 0.24),
+      rgba(232, 241, 234, 0.24)
+    ),
     url("/images/bg-2.jpg");
 }
 
 .trip-bg-details {
   background-image:
-    linear-gradient(180deg, rgba(247, 250, 252, 0.24), rgba(232, 241, 234, 0.24)),
+    linear-gradient(
+      180deg,
+      rgba(247, 250, 252, 0.24),
+      rgba(232, 241, 234, 0.24)
+    ),
     url("/images/bg-3.jpg");
 }
 
@@ -203,7 +215,7 @@ tbody tr {
 }
 
 .stats span {
-  color: #394254;
+  color: #000000;
   padding: 8px 12px;
   font-size: 0.9rem;
   font-weight: 700;
@@ -446,11 +458,17 @@ tbody tr {
 .route-rider-pack p {
   max-width: min(44vw, 620px);
   margin: 0 0 34px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.72);
   color: #ffffff;
-  font-size: clamp(1rem, 2.6vw, 2.2rem);
+  font-size: clamp(1.05rem, 2.8vw, 2.35rem);
   font-weight: 900;
   line-height: 1;
   overflow-wrap: anywhere;
+  padding: 8px 14px 10px;
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.95),
+    0 0 12px rgba(0, 0, 0, 0.85);
   white-space: nowrap;
 }
 
@@ -521,7 +539,7 @@ tbody tr {
 }
 
 .payment-card span {
-  color: #273244;
+  color: #000000;
   font-size: 1.05rem;
   font-weight: 900;
 }
@@ -557,7 +575,7 @@ tbody tr {
 .add-place-form label {
   display: grid;
   gap: 6px;
-  color: #536072;
+  color: #0e1013;
   font-size: 0.78rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -638,7 +656,7 @@ tbody tr {
 
 .summary-card p {
   margin: 0 0 10px;
-  color: #536072;
+  color: #22272e;
   font-size: 0.85rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -655,7 +673,7 @@ tbody tr {
 .summary-card span {
   display: block;
   margin-top: 10px;
-  color: #667085;
+  color: #000000;
   font-size: 0.9rem;
   line-height: 1.35;
 }
@@ -675,7 +693,7 @@ tbody tr {
 }
 
 .table-actions span {
-  color: #536072;
+  color: #15181d;
   font-size: 0.92rem;
   font-weight: 800;
 }
@@ -705,15 +723,15 @@ th {
   position: sticky;
   top: 0;
   z-index: 1;
-  color: #111827;
+  color: #000000;
   font-size: 0.78rem;
   letter-spacing: 0;
   text-transform: uppercase;
 }
 
 td {
-  color: #273244;
-  font-size: 0.95rem;
+  color: #06080a;
+  font-size:1.09rem;
 }
 
 .money {
@@ -784,7 +802,7 @@ tbody tr.is-paid td,
 
 .food-expense-card span,
 .food-expense-card small {
-  color: #536072;
+  color: #000000;
   font-weight: 800;
 }
 
@@ -833,7 +851,7 @@ tbody tr.is-paid td,
 .visiting-access-card small {
   display: block;
   margin-top: 4px;
-  color: #536072;
+  color: #161a1f;
   font-size: 0.86rem;
   font-weight: 800;
 }
@@ -915,7 +933,7 @@ tbody tr.is-paid td,
 }
 
 .visit-copy strong {
-  color: #111827;
+  color: #000000;
   font-size: 1.05rem;
   line-height: 1.1;
 }
@@ -927,7 +945,7 @@ tbody tr.is-paid td,
 }
 
 .visit-copy small {
-  color: #536072;
+  color: #000000;
   font-size: 0.9rem;
   font-weight: 700;
   line-height: 1.35;
@@ -1105,8 +1123,16 @@ tbody tr.is-paid td,
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.88) 0 9%, transparent 10%),
-    radial-gradient(circle at 68% 20%, rgba(255, 255, 255, 0.72) 0 7%, transparent 8%);
+    radial-gradient(
+      circle at 18% 18%,
+      rgba(255, 255, 255, 0.88) 0 9%,
+      transparent 10%
+    ),
+    radial-gradient(
+      circle at 68% 20%,
+      rgba(255, 255, 255, 0.72) 0 7%,
+      transparent 8%
+    );
   opacity: 0;
   transition: opacity 220ms ease;
 }
@@ -1282,7 +1308,9 @@ tbody tr.is-paid td,
 }
 
 /* Responsiveness */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
   .top-bar,
   .route-panel,
   .map-section,
@@ -1455,8 +1483,8 @@ tbody tr.is-paid td,
   .visiting-pin-form button,
   .add-place-form button,
   .cancel-edit-button,
-.food-save-button,
-.food-expense-card button {
+  .food-save-button,
+  .food-expense-card button {
     width: 100%;
   }
 
@@ -1524,7 +1552,7 @@ tbody tr.is-paid td,
   }
 
   .route-rider-pack p {
-    max-width: 58vw;
+    max-width: min(70vw, 420px);
     margin-bottom: 18px;
     white-space: normal;
   }
@@ -1592,10 +1620,11 @@ tbody tr.is-paid td,
   }
 
   .route-rider-pack p {
-    max-width: 42vw;
+    max-width: min(72vw, 320px);
     margin-bottom: 16px;
-    font-size: clamp(0.82rem, 4.2vw, 1.05rem);
+    font-size: clamp(0.95rem, 4.8vw, 1.18rem);
     line-height: 1.1;
+    white-space: normal;
   }
 
   .table-actions {

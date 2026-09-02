@@ -43,7 +43,7 @@ function TripLoader({ onFinish }) {
       <div className="rider-track">
         <div className="rider-pack">
           <img src="/images/trip-rider.png" alt="Bike rider loading" decoding="async" fetchPriority="high" />
-          <p>tour na enaku nee than vathiyare...</p>
+          <p>Tour na enaku nee than vathiyare...</p>
         </div>
       </div>
 

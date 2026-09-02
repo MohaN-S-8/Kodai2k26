@@ -4,14 +4,18 @@ import { createPaymentLinks, hasPaymentReceiver } from "../lib/payment";
 import { formatMoney, getMoneyNumber } from "../utils/money";
 import { normalizeName } from "../utils/names";
 
+const EXPENSE_UPDATE_PIN = import.meta.env.VITE_TRIP_UPDATE_PIN || "";
+
 function isFullyPaid(member) {
   return getMoneyNumber(member?.[BALANCE_COLUMN]) <= 0;
 }
 
 function PaymentCard({ error, isUpdating, member, memberRows, onUpdatePayment }) {
-const [managerName, setManagerName] = useState("");
+  const [managerName, setManagerName] = useState("");
   const [managerAmount, setManagerAmount] = useState("");
   const [managerPin, setManagerPin] = useState("");
+  const [managerPinError, setManagerPinError] = useState("");
+  const [isManagerUnlocked, setIsManagerUnlocked] = useState(false);
 
   const isManager = normalizeName(member?.Name) === "kalai";
   const managerTarget = useMemo(
@@ -20,9 +24,11 @@ const [managerName, setManagerName] = useState("");
   );
 
   useEffect(() => {
-setManagerName(member?.Name || "");
+    setManagerName(member?.Name || "");
     setManagerAmount(member?.["Total given"] || "");
     setManagerPin("");
+    setManagerPinError("");
+    setIsManagerUnlocked(false);
   }, [member]);
 
   useEffect(() => {
@@ -41,7 +47,26 @@ setManagerName(member?.Name || "");
     payerName: member.Name,
   });
   const canPay = hasPaymentReceiver() && balanceAmount > 0;
-function handleManagerSubmit(event) {
+
+  function handleManagerPinSubmit(event) {
+    event.preventDefault();
+
+    if (!EXPENSE_UPDATE_PIN) {
+      setManagerPinError("Missing VITE_TRIP_UPDATE_PIN in env");
+      return;
+    }
+
+    if (managerPin.trim() !== EXPENSE_UPDATE_PIN) {
+      setIsManagerUnlocked(false);
+      setManagerPinError("Trip PIN is wrong");
+      return;
+    }
+
+    setIsManagerUnlocked(true);
+    setManagerPinError("");
+  }
+
+  function handleManagerSubmit(event) {
     event.preventDefault();
     onUpdatePayment({ name: managerName, totalGiven: managerAmount, pin: managerPin });
   }
@@ -54,7 +79,25 @@ function handleManagerSubmit(event) {
         <span>Balance: Rs {formatMoney(balanceAmount)}</span>
       </div>
 
-      {isManager && (
+      {isManager && !isManagerUnlocked && (
+        <form className="payment-edit-form" onSubmit={handleManagerPinSubmit}>
+          <label>
+            Trip PIN
+            <input
+              type="password"
+              value={managerPin}
+              onChange={(event) => setManagerPin(event.target.value)}
+              placeholder="Enter Trip PIN"
+            />
+          </label>
+          {managerPinError && <p className="payment-error">{managerPinError}</p>}
+          <button type="submit" disabled={!managerPin.trim()}>
+            Unlock edit option
+          </button>
+        </form>
+      )}
+
+      {isManager && isManagerUnlocked && (
         <form className="payment-edit-form manager-form" onSubmit={handleManagerSubmit}>
           <label>
             Select name
@@ -78,15 +121,6 @@ function handleManagerSubmit(event) {
               value={managerAmount}
               onChange={(event) => setManagerAmount(event.target.value)}
               placeholder="Payment amount"
-            />
-          </label>
-          <label>
-            Update PIN
-            <input
-              type="password"
-              value={managerPin}
-              onChange={(event) => setManagerPin(event.target.value)}
-              placeholder="Trip PIN"
             />
           </label>
           {error && <p className="payment-error">{error}</p>}
@@ -194,6 +228,3 @@ function ExpensePanel({
 }
 
 export default ExpensePanel;
-
-
-

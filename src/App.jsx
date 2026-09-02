@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ActionMenu from "./components/ActionMenu";
 import ExpensePanel from "./components/ExpensePanel";
+import FoodExpensePanel from "./components/FoodExpensePanel";
 import Header from "./components/Header";
 import NamePromptModal from "./components/NamePromptModal";
 import Toast from "./components/Toast";
@@ -142,6 +143,13 @@ function App() {
     setPromptTarget(null);
   }
 
+  function openFoodExpenses() {
+    setActiveView("food");
+    setSelectedMember(null);
+    setNameError("");
+    setPromptTarget(null);
+  }
+
   function closeNamePrompt() {
     setNameError("");
     setPromptTarget(null);
@@ -240,6 +248,7 @@ function App() {
               activeView={activeView}
               onOpenExpenses={openExpenseNamePrompt}
               onOpenVisiting={openVisitingPlaces}
+              onOpenFood={openFoodExpenses}
             />
 
             {activeView === "expenses" && (
@@ -256,6 +265,14 @@ function App() {
 
             {activeView === "visiting" && (
               <VisitingPlacesPanel
+                onClose={returnHome}
+                onToast={showToast}
+              />
+            )}
+
+            {activeView === "food" && (
+              <FoodExpensePanel
+                memberRows={memberRows}
                 onClose={returnHome}
                 onToast={showToast}
               />
@@ -282,9 +299,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
-
-

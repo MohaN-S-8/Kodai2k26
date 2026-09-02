@@ -114,6 +114,7 @@ h2 {
 .summary-grid,
 .table-panel,
 .visiting-panel,
+.food-panel,
 .state-panel,
 .name-modal {
   position: relative;
@@ -130,7 +131,9 @@ h2 {
 .stay-card,
 .visiting-access-card,
 .visiting-pin-form,
-.add-place-form {
+.add-place-form,
+.food-access-card,
+.food-expense-card {
   background: rgba(255, 255, 255, 0.5);
 }
 
@@ -212,7 +215,8 @@ tbody tr {
 .payment-card,
 .summary-grid,
 .table-panel,
-.visiting-panel {
+.visiting-panel,
+.food-panel {
   margin-bottom: 18px;
 }
 
@@ -227,7 +231,9 @@ tbody tr {
 .add-place-form button,
 .edit-place-button,
 .delete-place-button,
-.cancel-edit-button {
+.cancel-edit-button,
+.food-save-button,
+.food-expense-card button {
   border: 1px solid #111827;
   border-radius: 8px;
   background: #111827;
@@ -257,7 +263,9 @@ tbody tr {
 .add-place-form button,
 .edit-place-button,
 .delete-place-button,
-.cancel-edit-button {
+.cancel-edit-button,
+.food-save-button,
+.food-expense-card button {
   white-space: nowrap;
 }
 
@@ -559,7 +567,8 @@ tbody tr {
 .payment-edit-form select,
 .name-modal input,
 .visiting-pin-form input,
-.add-place-form input {
+.add-place-form input,
+.food-expense-card input {
   width: 100%;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
@@ -579,20 +588,25 @@ tbody tr {
 .payment-edit-form select:focus,
 .name-modal input:focus,
 .visiting-pin-form input:focus,
-.add-place-form input:focus {
+.add-place-form input:focus,
+.food-access-card select:focus,
+.food-expense-card input:focus {
   border-color: #210f37;
   outline: 3px solid rgba(13, 124, 102, 0.18);
 }
 
 .payment-edit-form button,
 .visiting-pin-form button,
-.add-place-form button {
+.add-place-form button,
+.food-save-button {
   padding: 12px 16px;
 }
 
 .payment-edit-form button:disabled,
 .visiting-pin-form button:disabled,
-.add-place-form button:disabled {
+.add-place-form button:disabled,
+.food-save-button:disabled,
+.food-expense-card button:disabled {
   cursor: not-allowed;
   opacity: 0.72;
 }
@@ -647,7 +661,8 @@ tbody tr {
 }
 
 .table-panel,
-.visiting-panel {
+.visiting-panel,
+.food-panel {
   max-width: 100%;
   overflow: hidden;
 }
@@ -725,6 +740,79 @@ tbody tr.is-paid td,
   text-decoration-thickness: 2px;
 }
 
+/* Food expenses */
+.food-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 12px;
+  padding: 14px;
+}
+
+.food-access-card {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+  margin: 0 18px 14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.food-expense-list {
+  display: grid;
+  gap: 12px;
+  padding: 0 18px 18px;
+}
+
+.food-expense-card {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) minmax(140px, 0.8fr) auto;
+  align-items: end;
+  gap: 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 14px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.07);
+}
+
+.food-expense-card h3 {
+  margin: 0 0 8px;
+  color: #111827;
+  font-size: 1.25rem;
+}
+
+.food-expense-card span,
+.food-expense-card small {
+  color: #536072;
+  font-weight: 800;
+}
+
+.food-expense-card small {
+  grid-column: 1 / -1;
+  line-height: 1.35;
+}
+
+.food-expense-card.is-paid {
+  background: rgba(236, 253, 245, 0.76);
+}
+
+.food-expense-card.is-paid h3 {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
+.payment-button.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+  pointer-events: none;
+}
+
+.food-save-button {
+  justify-self: end;
+  padding: 12px 16px;
+}
+
 /* Visiting places */
 .visiting-access-card {
   display: flex;
@@ -761,7 +849,9 @@ tbody tr.is-paid td,
 }
 
 .visiting-pin-form,
-.add-place-form {
+.add-place-form,
+.food-access-card,
+.food-expense-card {
   display: grid;
   grid-template-columns: minmax(160px, 1fr) auto;
   align-items: end;
@@ -772,7 +862,9 @@ tbody tr.is-paid td,
   padding: 14px;
 }
 
-.add-place-form {
+.add-place-form,
+.food-access-card,
+.food-expense-card {
   grid-template-columns:
     minmax(150px, 1fr) minmax(120px, 0.75fr) minmax(180px, 1.2fr)
     auto;
@@ -877,7 +969,9 @@ tbody tr.is-paid td,
 
 .edit-place-button,
 .delete-place-button,
-.cancel-edit-button {
+.cancel-edit-button,
+.food-save-button,
+.food-expense-card button {
   padding: 10px 12px;
   font-size: 0.82rem;
 }
@@ -1196,6 +1290,7 @@ tbody tr.is-paid td,
   .summary-grid,
   .table-panel,
   .visiting-panel,
+  .food-panel,
   .state-panel,
   .name-modal {
     background: rgba(255, 255, 255, 0.9);
@@ -1235,13 +1330,17 @@ tbody tr.is-paid td,
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .add-place-form {
+  .add-place-form,
+  .food-access-card,
+  .food-expense-card {
     grid-template-columns: 1fr 1fr;
   }
 
   .add-place-form label:nth-child(3),
   .add-place-form button,
-  .add-place-form .cancel-edit-button {
+  .add-place-form .cancel-edit-button,
+  .food-save-button,
+  .food-expense-card button {
     grid-column: 1 / -1;
   }
 }
@@ -1333,13 +1432,17 @@ tbody tr.is-paid td,
 
   .payment-edit-form.manager-form,
   .visiting-pin-form,
-  .add-place-form {
+  .add-place-form,
+  .food-access-card,
+  .food-expense-card {
     grid-template-columns: 1fr;
   }
 
   .visiting-access-card,
   .visiting-pin-form,
-  .add-place-form {
+  .add-place-form,
+  .food-access-card,
+  .food-expense-card {
     margin-left: 12px;
     margin-right: 12px;
   }
@@ -1351,8 +1454,14 @@ tbody tr.is-paid td,
 
   .visiting-pin-form button,
   .add-place-form button,
-  .cancel-edit-button {
+  .cancel-edit-button,
+.food-save-button,
+.food-expense-card button {
     width: 100%;
+  }
+
+  .food-save-button {
+    justify-self: stretch;
   }
 
   .visiting-grid {

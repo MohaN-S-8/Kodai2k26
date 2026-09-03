@@ -1732,12 +1732,12 @@ tbody tr.is-paid td,
 
 
   .route-van {
-    width: min(120px, 34vw);
+    width: min(50vw);
     margin-bottom: 14px;
   }
 
   .route-aapa {
-    width: min(74px, 22vw);
+    width: min(50vw);
     margin: 0 0 15px;
   }
 
@@ -1806,12 +1806,12 @@ tbody tr.is-paid td,
 
 
   .route-van {
-    width: min(94px, 27vw);
+    width: min(50vw);
     margin-bottom: 12px;
   }
 
   .route-aapa {
-    width: min(60px, 20vw);
+    width: min(50vw);
     margin: 0 0 15px;
   }
 

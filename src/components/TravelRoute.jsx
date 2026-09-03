@@ -64,6 +64,13 @@ function TravelRoute() {
             loading="lazy"
             decoding="async"
           />
+          <img
+            className="route-aapa"
+            src="/images/aapa.png"
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
         </div>
       </div>
     </section>

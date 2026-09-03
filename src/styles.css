@@ -435,7 +435,7 @@ tbody tr {
   align-items: flex-end;
   gap: 8px;
   min-width: max-content;
-  animation: routeCarMove 12s ease-in-out infinite;
+  animation: routeCarMove 40s ease-in-out infinite;
 }
 
 .route-rider {
@@ -443,6 +443,14 @@ tbody tr {
   height: auto;
   max-width: min(260px, 38vw);
   max-height: 128px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 10px rgba(17, 24, 39, 0.18));
+}
+
+.route-aapa {
+  width: min(220px, 15vw);
+  height: auto;
+  margin: 0 0 13px;
   object-fit: contain;
   filter: drop-shadow(0 10px 10px rgba(17, 24, 39, 0.18));
 }
@@ -1722,9 +1730,15 @@ tbody tr.is-paid td,
     max-height: 110px;
   }
 
+
   .route-van {
     width: min(120px, 34vw);
     margin-bottom: 14px;
+  }
+
+  .route-aapa {
+    width: min(74px, 22vw);
+    margin: 0 0 15px;
   }
 
   .route-rider-pack p {
@@ -1790,9 +1804,15 @@ tbody tr.is-paid td,
     max-height: 92px;
   }
 
+
   .route-van {
     width: min(94px, 27vw);
     margin-bottom: 12px;
+  }
+
+  .route-aapa {
+    width: min(60px, 20vw);
+    margin: 0 0 15px;
   }
 
   .route-rider-pack p {

@@ -740,7 +740,7 @@ th {
 
 td {
   color: #000000;
-  font-size:1.09rem;
+  font-size: 1.09rem;
 }
 
 .money {
@@ -951,8 +951,6 @@ tbody tr.is-paid td,
   outline: none;
 }
 
-
-
 .visiting-map-panel {
   height: clamp(260px, 42vh, 460px);
   margin: 16px 18px 4px;
@@ -969,9 +967,6 @@ tbody tr.is-paid td,
   height: 100%;
   border: 0;
 }
-
-
-
 
 .places-real-map {
   width: 100%;
@@ -1114,8 +1109,7 @@ tbody tr.is-paid td,
   opacity: 0.78;
 }
 
-
-  .place-actions {
+.place-actions {
   display: grid;
   align-content: start;
   gap: 8px;
@@ -1487,11 +1481,7 @@ tbody tr.is-paid td,
 }
 
 @media (min-width: 901px) {
-
-
-
-
-.visiting-grid {
+  .visiting-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
@@ -1519,11 +1509,7 @@ tbody tr.is-paid td,
 }
 
 @media (min-width: 721px) and (max-width: 900px) {
-
-
-
-
-.visiting-grid {
+  .visiting-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1730,14 +1716,13 @@ tbody tr.is-paid td,
     max-height: 110px;
   }
 
-
   .route-van {
     width: min(50vw);
     margin-bottom: 14px;
   }
 
   .route-aapa {
-    width: min(50vw);
+    width: min(35vw);
     margin: 0 0 15px;
   }
 
@@ -1804,14 +1789,13 @@ tbody tr.is-paid td,
     max-height: 92px;
   }
 
-
   .route-van {
     width: min(50vw);
     margin-bottom: 12px;
   }
 
   .route-aapa {
-    width: min(50vw);
+    width: min(35vw);
     margin: 0 0 15px;
   }
 

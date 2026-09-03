@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ActionMenu from "./components/ActionMenu";
 import ExpensePanel from "./components/ExpensePanel";
+import ExpenseSpentPanel from "./components/ExpenseSpentPanel";
 import FoodExpensePanel from "./components/FoodExpensePanel";
 import Header from "./components/Header";
 import Toast from "./components/Toast";
@@ -28,6 +29,7 @@ function App() {
   const [selectedMember, setSelectedMember] = useState(null);
   const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
   const [paymentUpdateError, setPaymentUpdateError] = useState("");
+  const [paymentManagerPin, setPaymentManagerPin] = useState(() => sessionStorage.getItem("kodai-payment-manager-pin") || "");
   const [toast, setToast] = useState(null);
   const selectedMemberNameRef = useRef("");
 
@@ -116,6 +118,12 @@ function App() {
     () => memberRows.map((row) => row.Name).filter(Boolean),
     [memberRows]
   );
+  const isPaymentManagerUnlocked = Boolean(paymentManagerPin);
+
+  const unlockPaymentManager = useCallback((pin) => {
+    setPaymentManagerPin(pin);
+    sessionStorage.setItem("kodai-payment-manager-pin", pin);
+  }, []);
 
   const showToast = useCallback((type, message) => {
     setToast({ type, message });
@@ -143,6 +151,12 @@ function App() {
 
   function openFoodExpenses() {
     setActiveView("food");
+    setSelectedMember(null);
+    setNameError("");
+  }
+
+  function openSpentExpenses() {
+    setActiveView("spent");
     setSelectedMember(null);
     setNameError("");
   }
@@ -239,6 +253,7 @@ function App() {
               onOpenExpenses={openExpenseNamePrompt}
               onOpenVisiting={openVisitingPlaces}
               onOpenFood={openFoodExpenses}
+              onOpenSpent={openSpentExpenses}
             />
 
             {activeView === "expenses" && (
@@ -252,6 +267,9 @@ function App() {
                 onSelectMember={handleNameSubmit}
                 onUpdatePayment={handlePaymentUpdate}
                 isUpdatingPayment={isUpdatingPayment}
+                isPaymentManagerUnlocked={isPaymentManagerUnlocked}
+                paymentManagerPin={paymentManagerPin}
+                onPaymentManagerUnlock={unlockPaymentManager}
                 paymentUpdateError={paymentUpdateError}
               />
             )}
@@ -263,6 +281,13 @@ function App() {
               />
             )}
 
+
+            {activeView === "spent" && (
+              <ExpenseSpentPanel
+                onClose={returnHome}
+                onToast={showToast}
+              />
+            )}
             {activeView === "food" && (
               <FoodExpensePanel
                 memberRows={memberRows}

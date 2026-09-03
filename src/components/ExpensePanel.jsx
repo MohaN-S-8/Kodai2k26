@@ -10,13 +10,12 @@ function isFullyPaid(member) {
   return getMoneyNumber(member?.[BALANCE_COLUMN]) <= 0;
 }
 
-function PaymentCard({ error, isUpdating, member, memberRows, nameError, names = [], onSelectMember, onUpdatePayment }) {
+function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows, nameError, names = [], onPaymentManagerUnlock, onSelectMember, onUpdatePayment, paymentManagerPin }) {
   const [name, setName] = useState("");
   const [managerName, setManagerName] = useState("");
   const [managerAmount, setManagerAmount] = useState("");
   const [managerPin, setManagerPin] = useState("");
   const [managerPinError, setManagerPinError] = useState("");
-  const [isManagerUnlocked, setIsManagerUnlocked] = useState(false);
 
   const namesListId = useId();
   const isManager = normalizeName(member?.Name) === "kalai";
@@ -28,10 +27,9 @@ function PaymentCard({ error, isUpdating, member, memberRows, nameError, names =
   useEffect(() => {
     setManagerName(member?.Name || "");
     setManagerAmount(member?.["Total given"] || "");
-    setManagerPin("");
+    setManagerPin(paymentManagerPin || "");
     setManagerPinError("");
-    setIsManagerUnlocked(false);
-  }, [member]);
+  }, [member?.Name, paymentManagerPin]);
 
   useEffect(() => {
     if (managerTarget) {
@@ -82,7 +80,8 @@ function PaymentCard({ error, isUpdating, member, memberRows, nameError, names =
     payerName: member.Name,
   });
   const canPay = hasPaymentReceiver() && balanceAmount > 0;
-function handleManagerPinSubmit(event) {
+
+  function handleManagerPinSubmit(event) {
     event.preventDefault();
 
     if (!EXPENSE_UPDATE_PIN) {
@@ -91,18 +90,17 @@ function handleManagerPinSubmit(event) {
     }
 
     if (managerPin.trim() !== EXPENSE_UPDATE_PIN) {
-      setIsManagerUnlocked(false);
       setManagerPinError("Trip PIN is wrong");
       return;
     }
 
-    setIsManagerUnlocked(true);
+    onPaymentManagerUnlock(managerPin.trim());
     setManagerPinError("");
   }
 
   function handleManagerSubmit(event) {
     event.preventDefault();
-    onUpdatePayment({ name: managerName, totalGiven: managerAmount, pin: managerPin });
+    onUpdatePayment({ name: managerName, totalGiven: managerAmount, pin: managerPin || paymentManagerPin });
   }
 
   return (
@@ -182,12 +180,15 @@ function ExpensePanel({
   memberRows,
   paymentUpdateError,
   isUpdatingPayment,
+  isPaymentManagerUnlocked,
   nameError,
   names,
   selectedMember,
   onClose,
+  onPaymentManagerUnlock,
   onSelectMember,
   onUpdatePayment,
+  paymentManagerPin,
 }) {
   const visibleColumns = displayColumns.filter((column) => column !== "No");
 
@@ -195,13 +196,16 @@ function ExpensePanel({
     <>
       <PaymentCard
         error={paymentUpdateError}
+        isManagerUnlocked={isPaymentManagerUnlocked}
         isUpdating={isUpdatingPayment}
         member={selectedMember}
         memberRows={memberRows}
         nameError={nameError}
         names={names}
+        onPaymentManagerUnlock={onPaymentManagerUnlock}
         onSelectMember={onSelectMember}
         onUpdatePayment={onUpdatePayment}
+        paymentManagerPin={paymentManagerPin}
       />
 
       <section className="summary-grid" aria-label="Common trip costs">

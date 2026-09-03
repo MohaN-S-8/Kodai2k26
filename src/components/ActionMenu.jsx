@@ -1,4 +1,4 @@
-function ActionMenu({ activeView, onOpenExpenses, onOpenVisiting, onOpenFood }) {
+function ActionMenu({ activeView, onOpenExpenses, onOpenVisiting, onOpenFood, onOpenSpent }) {
   return (
     <section className="action-strip" aria-label="Trip actions">
       <button
@@ -14,6 +14,13 @@ function ActionMenu({ activeView, onOpenExpenses, onOpenVisiting, onOpenFood }) 
         onClick={onOpenVisiting}
       >
         Visiting places
+      </button>
+      <button
+        className={`menu-option ${activeView === "spent" ? "is-active" : ""}`}
+        type="button"
+        onClick={onOpenSpent}
+      >
+        Expense Spent
       </button>
       {/* <button
         className={`menu-option ${activeView === "food" ? "is-active" : ""}`}

@@ -284,6 +284,7 @@ function App() {
 
             {activeView === "spent" && (
               <ExpenseSpentPanel
+                memberRows={memberRows}
                 onClose={returnHome}
                 onToast={showToast}
               />

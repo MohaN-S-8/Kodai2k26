@@ -53,7 +53,8 @@ function ExpenseSpentPanel({ memberRows = [], onClose, onToast }) {
   const [expenses, setExpenses] = useState(() => getStoredExpenses());
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
-  const [pin, setPin] = useState("");
+    const [splitCount, setSplitCount] = useState("");
+const [pin, setPin] = useState("");
   const [editorPin, setEditorPin] = useState(() => sessionStorage.getItem(SPENT_PIN_STORAGE_KEY) || "");
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -62,8 +63,15 @@ function ExpenseSpentPanel({ memberRows = [], onClose, onToast }) {
     () => expenses.reduce((total, expense) => total + expense.amount, 0),
     [expenses],
   );
-  const peopleCount = memberRows.length || 1;
-  const totalPerHead = Math.ceil(totalSpent / peopleCount);
+  const sheetPeopleCount = memberRows.length || 1;
+  const splitPeopleCount = Math.max(Number(splitCount || sheetPeopleCount) || sheetPeopleCount, 1);
+  const totalPerHead = Math.ceil(totalSpent / splitPeopleCount);
+
+  useEffect(() => {
+    if (!splitCount && sheetPeopleCount > 0) {
+      setSplitCount(String(sheetPeopleCount));
+    }
+  }, [sheetPeopleCount, splitCount]);
 
   useEffect(() => {
     let cancelled = false;
@@ -177,13 +185,29 @@ function ExpenseSpentPanel({ memberRows = [], onClose, onToast }) {
           <h2>Trip spending log</h2>
         </div>
         <div className="table-actions">
-          <span>Rs {formatMoney(totalSpent)} spent | Rs {formatMoney(totalPerHead)} per head ({peopleCount} people)</span>
+          <span>{sheetPeopleCount} people from sheet | Rs {formatMoney(totalPerHead)} per head</span>
           <button className="close-panel-button" type="button" onClick={onClose}>
             Close
           </button>
         </div>
       </div>
 
+
+      <div className="spent-split-card">
+        <div>
+          <h3>Split people</h3>
+          <p>Default comes from the payment sheet people count.</p>
+        </div>
+        <input
+          type="number"
+          min="1"
+          step="1"
+          value={splitCount}
+          onChange={(event) => setSplitCount(event.target.value)}
+          placeholder={`${sheetPeopleCount} people`}
+          aria-label="People count for per-head split"
+        />
+      </div>
       <div className="spent-access-card">
         <div>
           <h3>{isUnlocked ? "Kalai editor unlocked" : "View only"}</h3>
@@ -248,8 +272,8 @@ function ExpenseSpentPanel({ memberRows = [], onClose, onToast }) {
                 <p>{formatDate(expense.createdAt)}</p>
               </div>
               <div className="spent-amount-stack">
-                <strong>Rs {formatMoney(expense.amount)}</strong>
-                <span>Rs {formatMoney(Math.ceil(expense.amount / peopleCount))} per head ({peopleCount} people)</span>
+                <strong>Rs {formatMoney(Math.ceil(expense.amount / splitPeopleCount))} per head</strong>
+                <span>Total Rs {formatMoney(expense.amount)} split by {splitPeopleCount} people</span>
               </div>
             </article>
           ))

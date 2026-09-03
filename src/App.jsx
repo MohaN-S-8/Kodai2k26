@@ -3,7 +3,6 @@ import ActionMenu from "./components/ActionMenu";
 import ExpensePanel from "./components/ExpensePanel";
 import FoodExpensePanel from "./components/FoodExpensePanel";
 import Header from "./components/Header";
-import NamePromptModal from "./components/NamePromptModal";
 import Toast from "./components/Toast";
 import TripLoader from "./components/TripLoader";
 import TripMap from "./components/TripMap";
@@ -25,7 +24,6 @@ function App() {
   const [error, setError] = useState("");
   const [activeView, setActiveView] = useState("home");
   const [showIntro, setShowIntro] = useState(true);
-  const [promptTarget, setPromptTarget] = useState(null);
   const [nameError, setNameError] = useState("");
   const [selectedMember, setSelectedMember] = useState(null);
   const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
@@ -128,33 +126,26 @@ function App() {
     setActiveView("home");
     setSelectedMember(null);
     setNameError("");
-    setPromptTarget(null);
   }
 
   function openExpenseNamePrompt() {
     setNameError("");
-    setPromptTarget("expenses");
+    setPaymentUpdateError("");
+    setSelectedMember(null);
+    setActiveView("expenses");
   }
 
   function openVisitingPlaces() {
     setActiveView("visiting");
     setSelectedMember(null);
     setNameError("");
-    setPromptTarget(null);
   }
 
   function openFoodExpenses() {
     setActiveView("food");
     setSelectedMember(null);
     setNameError("");
-    setPromptTarget(null);
   }
-
-  function closeNamePrompt() {
-    setNameError("");
-    setPromptTarget(null);
-  }
-
 
   async function handlePaymentUpdate({ name, totalGiven, pin }) {
     const targetName = name || selectedMember?.Name;
@@ -191,8 +182,7 @@ function App() {
     }
 
     setSelectedMember(matchedMember);
-    setActiveView(promptTarget || "expenses");
-    closeNamePrompt();
+    setActiveView("expenses");
   }
 
   if (showIntro) {
@@ -255,8 +245,11 @@ function App() {
               <ExpensePanel
                 displayColumns={displayColumns}
                 memberRows={memberRows}
+                nameError={nameError}
+                names={promptNames}
                 selectedMember={selectedMember}
                 onClose={returnHome}
+                onSelectMember={handleNameSubmit}
                 onUpdatePayment={handlePaymentUpdate}
                 isUpdatingPayment={isUpdatingPayment}
                 paymentUpdateError={paymentUpdateError}
@@ -282,19 +275,7 @@ function App() {
       )}
 
       <Toast toast={toast} onClose={() => setToast(null)} />
-
-      {promptTarget && (
-        <NamePromptModal
-          error={nameError}
-          eyebrow="Verify urself"
-          names={promptNames}
-          submitLabel="Show Balance"
-          title="Select your name"
-          onClose={closeNamePrompt}
-          onSubmit={handleNameSubmit}
-        />
-      )}
-    </main>
+</main>
   );
 }
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { BALANCE_COLUMN, COLUMN_LABELS, COMMON_COSTS, MONEY_COLUMNS } from "../data/tripConfig";
 import { createPaymentLinks, hasPaymentReceiver } from "../lib/payment";
 import { formatMoney, getMoneyNumber } from "../utils/money";
@@ -10,13 +10,15 @@ function isFullyPaid(member) {
   return getMoneyNumber(member?.[BALANCE_COLUMN]) <= 0;
 }
 
-function PaymentCard({ error, isUpdating, member, memberRows, onUpdatePayment }) {
+function PaymentCard({ error, isUpdating, member, memberRows, nameError, names = [], onSelectMember, onUpdatePayment }) {
+  const [name, setName] = useState("");
   const [managerName, setManagerName] = useState("");
   const [managerAmount, setManagerAmount] = useState("");
   const [managerPin, setManagerPin] = useState("");
   const [managerPinError, setManagerPinError] = useState("");
   const [isManagerUnlocked, setIsManagerUnlocked] = useState(false);
 
+  const namesListId = useId();
   const isManager = normalizeName(member?.Name) === "kalai";
   const managerTarget = useMemo(
     () => memberRows.find((row) => row.Name === managerName) || null,
@@ -38,7 +40,40 @@ function PaymentCard({ error, isUpdating, member, memberRows, onUpdatePayment })
   }, [managerTarget]);
 
   if (!member) {
-    return null;
+    return (
+      <section className="payment-card payment-card-verify" aria-label="Verify your trip payment balance">
+        <form
+          className="payment-verify-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            onSelectMember(name);
+          }}
+        >
+          <div>
+            <p className="eyebrow">Verify urself</p>
+            <h2>Select your name</h2>
+          </div>
+          <input
+            autoFocus
+            list={namesListId}
+            type="text"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            placeholder="Type or select name"
+            aria-label="Your name in the trip sheet"
+          />
+          <datalist id={namesListId}>
+            {names.map((nameOption) => (
+              <option key={nameOption} value={nameOption} />
+            ))}
+          </datalist>
+          {nameError && <p className="payment-error">{nameError}</p>}
+          <button type="submit" disabled={!name.trim()}>
+            Show Balance
+          </button>
+        </form>
+      </section>
+    );
   }
 
   const balanceAmount = getMoneyNumber(member[BALANCE_COLUMN]);
@@ -47,8 +82,7 @@ function PaymentCard({ error, isUpdating, member, memberRows, onUpdatePayment })
     payerName: member.Name,
   });
   const canPay = hasPaymentReceiver() && balanceAmount > 0;
-
-  function handleManagerPinSubmit(event) {
+function handleManagerPinSubmit(event) {
     event.preventDefault();
 
     if (!EXPENSE_UPDATE_PIN) {
@@ -148,8 +182,11 @@ function ExpensePanel({
   memberRows,
   paymentUpdateError,
   isUpdatingPayment,
+  nameError,
+  names,
   selectedMember,
   onClose,
+  onSelectMember,
   onUpdatePayment,
 }) {
   const visibleColumns = displayColumns.filter((column) => column !== "No");
@@ -161,6 +198,9 @@ function ExpensePanel({
         isUpdating={isUpdatingPayment}
         member={selectedMember}
         memberRows={memberRows}
+        nameError={nameError}
+        names={names}
+        onSelectMember={onSelectMember}
         onUpdatePayment={onUpdatePayment}
       />
 

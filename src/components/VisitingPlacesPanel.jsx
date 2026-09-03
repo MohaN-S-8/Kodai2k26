@@ -1,14 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { VISITING_PLACES } from "../data/visitingPlaces";
 import { fetchVisitingPlaces, saveVisitingPlaces } from "../lib/visitingPlaces";
+import { loadLeaflet } from "../utils/leaflet";
 
 const CUSTOM_PLACES_KEY = "Kodaikanal-custom-visiting-places";
 const STORAGE_KEY = "Kodaikanal-visiting-places";
 const VISITING_UPDATE_PIN = import.meta.env.VITE_TRIP_UPDATE_PIN || "";
 const VISITING_DAY_1_ROUTE_URL = import.meta.env.VITE_VISITING_DAY_1_ROUTE_URL || "https://maps.app.goo.gl/jRa5ooB2pMXLodjPA";
 const VISITING_DAY_2_ROUTE_URL = import.meta.env.VITE_VISITING_DAY_2_ROUTE_URL || "https://maps.app.goo.gl/VHZWKhNDmx4wJVKCA";
-const LEAFLET_CSS_URL = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-const LEAFLET_JS_URL = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
 const VISITING_REFRESH_INTERVAL_MS = Math.max(
   Number(
     import.meta.env.VITE_VISITING_PLACES_REFRESH_INTERVAL_MS ||
@@ -66,36 +65,6 @@ const VISITING_ROUTE_DAYS = [
     ],
   },
 ];
-function loadLeaflet() {
-  if (window.L) {
-    return Promise.resolve(window.L);
-  }
-
-  const existingLink = document.querySelector(`link[href="${LEAFLET_CSS_URL}"]`);
-  if (!existingLink) {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = LEAFLET_CSS_URL;
-    document.head.appendChild(link);
-  }
-
-  const existingScript = document.querySelector(`script[src="${LEAFLET_JS_URL}"]`);
-  if (existingScript) {
-    return new Promise((resolve, reject) => {
-      existingScript.addEventListener("load", () => resolve(window.L), { once: true });
-      existingScript.addEventListener("error", reject, { once: true });
-    });
-  }
-
-  return new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = LEAFLET_JS_URL;
-    script.async = true;
-    script.onload = () => resolve(window.L);
-    script.onerror = reject;
-    document.body.appendChild(script);
-  });
-}
 
 function RouteMap({ routeDay }) {
   const mapRef = useRef(null);

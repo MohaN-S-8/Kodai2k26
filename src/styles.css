@@ -2163,3 +2163,54 @@ tbody tr.is-paid td,
 .spent-empty {
   padding: 18px;
 }
+/* Expense spent amount layout override */
+.spent-item-side {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 10px;
+  margin-left: auto;
+  text-align: right;
+}
+
+.spent-amount-stack {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 8px;
+  text-align: right;
+}
+
+.spent-amount-stack strong {
+  display: block;
+  line-height: 1.15;
+}
+
+.spent-amount-stack span {
+  display: block;
+  color: #475467;
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.spent-edit-button,
+.spent-edit-actions button {
+  border: 1px solid #111827;
+  border-radius: 8px;
+  background: #111827;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 10px 14px;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .spent-item-side,
+  .spent-amount-stack {
+    align-items: flex-start;
+    margin-left: 0;
+    text-align: left;
+  }
+}

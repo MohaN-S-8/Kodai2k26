@@ -50,3 +50,20 @@ export async function addSpentExpense({ expense, pin }) {
 
   return readJsonResponse(response);
 }
+
+export async function saveSpentExpenses({ expenses, pin }) {
+  if (!SPENT_EXPENSES_API_URL) {
+    throw new Error("Spent expense updates need VITE_SPENT_EXPENSES_API_URL=/api/spent-expenses");
+  }
+
+  const response = await fetch(SPENT_EXPENSES_API_URL, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Trip-Update-Pin": pin,
+    },
+    body: JSON.stringify({ expenses }),
+  });
+
+  return readJsonResponse(response);
+}

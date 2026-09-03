@@ -2081,7 +2081,7 @@ tbody tr.is-paid td,
 }
 
 .spent-entry-form {
-  grid-template-columns: minmax(140px, 0.6fr) minmax(220px, 1.4fr) auto;
+  grid-template-columns: minmax(120px, 0.55fr) minmax(220px, 1.35fr) minmax(120px, 0.55fr) auto;
 }
 
 .spent-pin-form label,

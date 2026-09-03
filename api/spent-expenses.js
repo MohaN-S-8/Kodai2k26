@@ -5,7 +5,7 @@ const SHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets";
 const SPREADSHEET_ID = process.env.GOOGLE_SHEET_SPREADSHEET_ID;
 const SHEET_NAME = process.env.GOOGLE_SPENT_EXPENSES_SHEET_NAME || "Expense Spent";
 const UPDATE_PIN = process.env.TRIP_UPDATE_PIN;
-const HEADERS = ["id", "createdAt", "amount", "note"];
+const HEADERS = ["id", "createdAt", "amount", "note", "splitPeople"];
 
 function base64Url(value) {
   return Buffer.from(value).toString("base64").replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
@@ -91,31 +91,48 @@ async function ensureSheetExists() {
 
 function cleanSpentExpense(expense) {
   const amount = Number(String(expense.amount || 0).replace(/,/g, ""));
+  const rawSplitPeople = String(expense.splitPeople ?? "").trim();
+  const splitPeople = rawSplitPeople ? Number(rawSplitPeople.replace(/,/g, "")) : "";
 
   return {
     id: String(expense.id || `spent-${Date.now()}`).trim(),
     createdAt: String(expense.createdAt || new Date().toISOString()).trim(),
     amount: Number.isFinite(amount) ? amount : 0,
     note: String(expense.note || "").trim(),
+    splitPeople: Number.isFinite(splitPeople) && splitPeople > 0 ? Math.ceil(splitPeople) : "",
   };
 }
 
 function rowsToExpenses(rows) {
   return rows
-    .map((row) => cleanSpentExpense({ id: row[0], createdAt: row[1], amount: row[2], note: row[3] }))
+    .map((row) => cleanSpentExpense({ id: row[0], createdAt: row[1], amount: row[2], note: row[3], splitPeople: row[4] }))
     .filter((expense) => expense.id && expense.amount > 0 && expense.note);
 }
 
 function expensesToRows(expenses) {
-  return expenses.map(cleanSpentExpense).map((expense) => [expense.id, expense.createdAt, expense.amount, expense.note]);
+  return expenses.map(cleanSpentExpense).map((expense) => [expense.id, expense.createdAt, expense.amount, expense.note, expense.splitPeople]);
+}
+
+async function writeSpentExpenses(expenses) {
+  await ensureSheetExists();
+  const range = `${quoteSheetName(SHEET_NAME)}!A:E`;
+  const rows = expensesToRows(expenses);
+
+  await sheetsRequest(`/values/${encodeURIComponent(range)}:clear`, { method: "POST", body: JSON.stringify({}) });
+  await sheetsRequest(`/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`, {
+    method: "PUT",
+    body: JSON.stringify({ values: [HEADERS, ...rows] }),
+  });
+
+  return { expenses: rowsToExpenses(rows).sort((first, second) => second.createdAt.localeCompare(first.createdAt)) };
 }
 
 async function readSpentExpenses() {
   await ensureSheetExists();
-  const range = `${quoteSheetName(SHEET_NAME)}!A:D`;
+  const range = `${quoteSheetName(SHEET_NAME)}!A:E`;
   const data = await sheetsRequest(`/values/${encodeURIComponent(range)}`);
   const values = data.values || [];
-  const hasHeaders = HEADERS.every((header, index) => values[0]?.[index] === header);
+  const hasHeaders = HEADERS.slice(0, 4).every((header, index) => values[0]?.[index] === header);
 
   if (!hasHeaders) {
     await sheetsRequest(`/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED`, {
@@ -125,11 +142,16 @@ async function readSpentExpenses() {
     return { expenses: [] };
   }
 
-  return { expenses: rowsToExpenses(values.slice(1)).sort((first, second) => second.createdAt.localeCompare(first.createdAt)) };
+  const expenses = rowsToExpenses(values.slice(1)).sort((first, second) => second.createdAt.localeCompare(first.createdAt));
+
+  if (values[0]?.[4] !== "splitPeople") {
+    return writeSpentExpenses(expenses);
+  }
+
+  return { expenses };
 }
 
 async function appendSpentExpense(expense) {
-  await ensureSheetExists();
   const cleanExpense = cleanSpentExpense(expense);
 
   if (cleanExpense.amount <= 0) {
@@ -140,13 +162,8 @@ async function appendSpentExpense(expense) {
     throw new Error("Note is required");
   }
 
-  const range = `${quoteSheetName(SHEET_NAME)}!A:D`;
-  await sheetsRequest(`/values/${encodeURIComponent(range)}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`, {
-    method: "POST",
-    body: JSON.stringify({ values: expensesToRows([cleanExpense]) }),
-  });
-
-  return readSpentExpenses();
+  const current = await readSpentExpenses();
+  return writeSpentExpenses([cleanExpense, ...current.expenses.filter((entry) => entry.id !== cleanExpense.id)]);
 }
 
 function assertUpdatePin(request) {
@@ -172,7 +189,7 @@ async function readJsonBody(request) {
 }
 
 export default async function handler(request, response) {
-  response.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  response.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS");
   response.setHeader("Access-Control-Allow-Headers", "Content-Type,X-Trip-Update-Pin");
   response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
   response.setHeader("Pragma", "no-cache");
@@ -192,6 +209,12 @@ export default async function handler(request, response) {
     if (request.method === "POST") {
       assertUpdatePin(request);
       response.status(200).json(await appendSpentExpense((await readJsonBody(request)).expense || {}));
+      return;
+    }
+
+    if (request.method === "PUT") {
+      assertUpdatePin(request);
+      response.status(200).json(await writeSpentExpenses((await readJsonBody(request)).expenses || []));
       return;
     }
 

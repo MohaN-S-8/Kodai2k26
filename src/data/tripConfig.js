@@ -11,7 +11,7 @@ export const COMMON_COSTS = [
   },
   {
     label: "Camera Total",
-    value: "1950",
+    value: "2340",
     note: "Already added to whoever pays it",
   },
   {

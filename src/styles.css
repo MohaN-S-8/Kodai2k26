@@ -2227,3 +2227,14 @@ tbody tr.has-balance-without-food td {
   color: #7c2d12;
   font-weight: 900;
 }
+.payment-checkbox-label {
+  align-items: center;
+  grid-template-columns: auto 1fr;
+  text-transform: none;
+}
+
+.payment-checkbox-label input {
+  width: 18px;
+  height: 18px;
+  accent-color: #111827;
+}

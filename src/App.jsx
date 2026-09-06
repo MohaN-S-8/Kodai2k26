@@ -161,7 +161,7 @@ function App() {
     setNameError("");
   }
 
-  async function handlePaymentUpdate({ name, totalGiven, pin }) {
+  async function handlePaymentUpdate({ name, totalGiven, pin, removeBalanceAdjustment = false }) {
     const targetName = name || selectedMember?.Name;
 
     if (!targetName) {
@@ -175,6 +175,7 @@ function App() {
         name: targetName,
         totalGiven,
         pin,
+        removeBalanceAdjustment,
       });
       applySheetData(data, selectedMember?.Name);
       showToast("success", `${targetName} payment updated successfully`);

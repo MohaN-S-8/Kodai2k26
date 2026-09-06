@@ -138,7 +138,7 @@ export async function fetchTripSheetData() {
   return fetchFromCsv();
 }
 
-export async function updateTripPayment({ name, totalGiven, pin }) {
+export async function updateTripPayment({ name, totalGiven, pin, removeBalanceAdjustment = false }) {
   if (!SHEET_API_URL) {
     throw new Error("Payment updates need VITE_TRIP_SHEET_API_URL=/api/sheet");
   }
@@ -149,7 +149,7 @@ export async function updateTripPayment({ name, totalGiven, pin }) {
       "Content-Type": "application/json",
       "X-Trip-Update-Pin": pin,
     },
-    body: JSON.stringify({ name, totalGiven }),
+    body: JSON.stringify({ name, totalGiven, removeBalanceAdjustment }),
   });
 
   return readJsonResponse(response);

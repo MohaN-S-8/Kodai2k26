@@ -19,6 +19,7 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
   const [managerAmount, setManagerAmount] = useState("");
   const [managerPin, setManagerPin] = useState("");
   const [managerPinError, setManagerPinError] = useState("");
+  const [removeBalanceAdjustment, setRemoveBalanceAdjustment] = useState(false);
 
   const namesListId = useId();
   const isManager = normalizeName(member?.Name) === "kalai";
@@ -37,6 +38,7 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
   useEffect(() => {
     if (managerTarget) {
       setManagerAmount(managerTarget["Total given"] || "");
+      setRemoveBalanceAdjustment(false);
     }
   }, [managerTarget]);
 
@@ -103,7 +105,12 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
 
   function handleManagerSubmit(event) {
     event.preventDefault();
-    onUpdatePayment({ name: managerName, totalGiven: managerAmount, pin: managerPin || paymentManagerPin });
+    onUpdatePayment({
+      name: managerName,
+      totalGiven: managerAmount,
+      pin: managerPin || paymentManagerPin,
+      removeBalanceAdjustment: managerTarget?.__hasBalanceAdjustment && removeBalanceAdjustment,
+    });
   }
 
   return (
@@ -150,14 +157,23 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
           <label>
             Total given
             <input
-              type="number"
-              min="0"
-              step="1"
+              type="text"
+              inputMode="decimal"
               value={managerAmount}
               onChange={(event) => setManagerAmount(event.target.value)}
-              placeholder="Payment amount"
+              placeholder="Payment amount or 800+3320"
             />
           </label>
+          {managerTarget?.__hasBalanceAdjustment && (
+            <label className="payment-checkbox-label">
+              <input
+                type="checkbox"
+                checked={removeBalanceAdjustment}
+                onChange={(event) => setRemoveBalanceAdjustment(event.target.checked)}
+              />
+              Remove balance highlight
+            </label>
+          )}
           {error && <p className="payment-error">{error}</p>}
           <button type="submit" disabled={isUpdating || !managerName}>
             {isUpdating ? "Updating..." : "Update Selected"}
@@ -275,3 +291,4 @@ function ExpensePanel({
 }
 
 export default ExpensePanel;
+

@@ -83,6 +83,25 @@ function cleanHeader(value, index) {
 function hasAddedFormulaAmount(formula) {
   return /^=/.test(String(formula || "").trim()) && /\+\s*\d+(?:\.\d+)?\s*$/.test(String(formula || ""));
 }
+function parseAmountExpression(value) {
+  const expression = String(value || "").replace(/,/g, "").trim();
+
+  if (!/^\d+(?:\.\d+)?(?:\s*\+\s*\d+(?:\.\d+)?)*$/.test(expression)) {
+    return "";
+  }
+
+  const total = expression
+    .split("+")
+    .map((part) => Number(part.trim()))
+    .reduce((sum, number) => sum + number, 0);
+
+  return Number.isFinite(total) ? String(total) : "";
+}
+
+function removeAddedFormulaAmount(formula) {
+  const cleanFormula = String(formula || "").trim();
+  return hasAddedFormulaAmount(cleanFormula) ? cleanFormula.replace(/\+\s*\d+(?:\.\d+)?\s*$/, "") : cleanFormula;
+}
 
 function recordsToData(records, formulaRecords = []) {
   if (records.length === 0) {
@@ -90,7 +109,7 @@ function recordsToData(records, formulaRecords = []) {
   }
 
   const columns = records[0].map(cleanHeader);
-    const balanceColumnIndex = columns.indexOf("Balance Amount From per Person Without food");
+  const balanceColumnIndex = columns.indexOf("Balance Amount From per Person Without food");
   const rows = records.slice(1).map((values, rowIndex) => {
     const row = columns.reduce((result, column, index) => {
       result[column] = values[index] || "";
@@ -263,13 +282,13 @@ function assertUpdatePin(request) {
   }
 }
 
-async function updateTotalGiven({ name, totalGiven }) {
+async function updateTotalGiven({ name, totalGiven, removeBalanceAdjustment = false }) {
   if (!getGoogleCredentials()) {
     throw new Error("Sheet editing needs Google service account env vars on Vercel");
   }
 
   const cleanName = String(name || "").trim().toLowerCase();
-  const cleanAmount = String(totalGiven || "").replace(/[^0-9.]/g, "").trim();
+  const cleanAmount = parseAmountExpression(totalGiven);
 
   if (!cleanName || !cleanAmount) {
     throw new Error("Name and payment amount are required");
@@ -282,6 +301,7 @@ async function updateTotalGiven({ name, totalGiven }) {
   const columns = (values[0] || []).map(cleanHeader);
   const nameIndex = columns.indexOf("Name");
   const totalGivenIndex = columns.indexOf("Total given");
+  const balanceIndex = columns.indexOf("Balance Amount From per Person Without food");
 
   if (nameIndex === -1 || totalGivenIndex === -1) {
     throw new Error("Sheet must contain Name and Total given columns");
@@ -296,12 +316,31 @@ async function updateTotalGiven({ name, totalGiven }) {
     throw new Error("Name not found in Google Sheet");
   }
 
-  const cell = `${columnLetter(totalGivenIndex)}${targetIndex + 1}`;
-  const updateRange = `${quoteSheetName(sheetTitle)}!${cell}`;
+  if (removeBalanceAdjustment && balanceIndex === -1) {
+    throw new Error("Sheet must contain Balance Without Food column");
+  }
 
-  await sheetsRequest(`/values/${encodeURIComponent(updateRange)}?valueInputOption=USER_ENTERED`, {
-    method: "PUT",
-    body: JSON.stringify({ values: [[cleanAmount]] }),
+  const updates = [
+    {
+      range: `${quoteSheetName(sheetTitle)}!${columnLetter(totalGivenIndex)}${targetIndex + 1}`,
+      values: [[cleanAmount]],
+    },
+  ];
+
+  if (removeBalanceAdjustment) {
+    const formulaRange = `${quoteSheetName(sheetTitle)}!${columnLetter(balanceIndex)}${targetIndex + 1}`;
+    const formulaData = await sheetsRequest(`/values/${encodeURIComponent(formulaRange)}?valueRenderOption=FORMULA`);
+    const currentFormula = formulaData.values?.[0]?.[0] || "";
+    const nextFormula = removeAddedFormulaAmount(currentFormula);
+
+    if (nextFormula && nextFormula !== currentFormula) {
+      updates.push({ range: formulaRange, values: [[nextFormula]] });
+    }
+  }
+
+  await sheetsRequest(`/values:batchUpdate?valueInputOption=USER_ENTERED`, {
+    method: "POST",
+    body: JSON.stringify({ data: updates }),
   });
 
   return readFromSheetsApi();
@@ -352,6 +391,8 @@ export default async function handler(request, response) {
     });
   }
 }
+
+
 
 
 

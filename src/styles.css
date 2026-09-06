@@ -663,6 +663,34 @@ tbody tr {
   line-height: 1.35;
 }
 
+.partial-payment-box {
+  display: grid;
+  grid-template-columns: minmax(150px, 190px) auto;
+  align-items: end;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.partial-payment-box label {
+  display: grid;
+  gap: 6px;
+  color: #0e1013;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.partial-payment-box input {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111827;
+  padding: 11px 12px;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
 .payment-edit-form {
   display: grid;
   grid-template-columns: repeat(2, minmax(130px, 1fr)) auto;
@@ -1599,6 +1627,11 @@ tbody tr.is-paid td,
     flex-direction: column;
   }
 
+  .partial-payment-box {
+    grid-template-columns: 1fr;
+    margin-left: 0;
+  }
+
   .payment-edit-form {
     grid-template-columns: 1fr;
   }
@@ -2238,3 +2271,4 @@ tbody tr.has-balance-without-food td {
   height: 18px;
   accent-color: #111827;
 }
+

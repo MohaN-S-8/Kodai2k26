@@ -20,9 +20,11 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
   const [managerPin, setManagerPin] = useState("");
   const [managerPinError, setManagerPinError] = useState("");
   const [removeBalanceAdjustment, setRemoveBalanceAdjustment] = useState(false);
+  const [payAmount, setPayAmount] = useState("");
 
   const namesListId = useId();
   const isManager = normalizeName(member?.Name) === "kalai";
+  const balanceAmount = getMoneyNumber(member?.[BALANCE_COLUMN]);
   const managerTarget = useMemo(
     () => memberRows.find((row) => row.Name === managerName) || null,
     [managerName, memberRows]
@@ -41,6 +43,11 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
       setRemoveBalanceAdjustment(false);
     }
   }, [managerTarget]);
+
+
+  useEffect(() => {
+    setPayAmount(balanceAmount > 0 ? String(balanceAmount) : "");
+  }, [balanceAmount, member?.Name]);
 
   if (!member) {
     return (
@@ -79,12 +86,12 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
     );
   }
 
-  const balanceAmount = getMoneyNumber(member[BALANCE_COLUMN]);
+  const payAmountNumber = getMoneyNumber(payAmount);
   const paymentLinks = createPaymentLinks({
-    amount: balanceAmount,
+    amount: payAmountNumber,
     payerName: member.Name,
   });
-  const canPay = hasPaymentReceiver() && balanceAmount > 0;
+  const canPay = hasPaymentReceiver() && balanceAmount > 0 && payAmountNumber > 0;
 
   function handleManagerPinSubmit(event) {
     event.preventDefault();
@@ -181,14 +188,30 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
         </form>
       )}
 
-      {canPay ? (
-        <a className="payment-button" href={paymentLinks.upi}>
-          Pay Rs {formatMoney(balanceAmount)} via GPay
-        </a>
-      ) : balanceAmount > 0 ? (
-        <p className="payment-note">
-          Add VITE_PAYMENT_UPI_ID in env to enable the UPI payment button.
-        </p>
+      {balanceAmount > 0 ? (
+        <div className="partial-payment-box">
+          <label>
+            Pay amount
+            <input
+              type="text"
+              inputMode="decimal"
+              value={payAmount}
+              onChange={(event) => setPayAmount(event.target.value)}
+              placeholder={String(balanceAmount)}
+            />
+          </label>
+          {canPay ? (
+            <a className="payment-button" href={paymentLinks.upi}>
+              Pay Rs {formatMoney(payAmountNumber)} via GPay
+            </a>
+          ) : hasPaymentReceiver() ? (
+            <p className="payment-note">Enter amount to pay.</p>
+          ) : (
+            <p className="payment-note">
+              Add VITE_PAYMENT_UPI_ID in env to enable the UPI payment button.
+            </p>
+          )}
+        </div>
       ) : (
         <p className="payment-note">Payment completed</p>
       )}
@@ -293,6 +316,9 @@ function ExpensePanel({
 }
 
 export default ExpensePanel;
+
+
+
 
 
 

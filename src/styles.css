@@ -691,6 +691,40 @@ tbody tr {
   font-weight: 800;
 }
 
+.upi-id-card {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.74);
+  color: #111827;
+}
+
+.upi-id-card span {
+  color: #475467;
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.upi-id-card strong {
+  overflow-wrap: anywhere;
+  font-size: 0.96rem;
+}
+
+.upi-id-card button {
+  border: 1px solid #111827;
+  border-radius: 8px;
+  background: #111827;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 9px 12px;
+  font-weight: 900;
+}
+
 .payment-edit-form {
   display: grid;
   grid-template-columns: repeat(2, minmax(130px, 1fr)) auto;
@@ -1632,6 +1666,11 @@ tbody tr.is-paid td,
     margin-left: 0;
   }
 
+  .upi-id-card {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+
   .payment-edit-form {
     grid-template-columns: 1fr;
   }
@@ -2271,4 +2310,5 @@ tbody tr.has-balance-without-food td {
   height: 18px;
   accent-color: #111827;
 }
+
 

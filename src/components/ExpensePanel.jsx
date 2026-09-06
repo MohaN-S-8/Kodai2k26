@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useState } from "react";
 import { BALANCE_COLUMN, COLUMN_LABELS, COMMON_COSTS, MONEY_COLUMNS } from "../data/tripConfig";
-import { createPaymentLinks, hasPaymentReceiver } from "../lib/payment";
+import { createPaymentLinks, getPaymentReceiver, hasPaymentReceiver } from "../lib/payment";
 import { formatMoney, getMoneyNumber } from "../utils/money";
 import { normalizeName } from "../utils/names";
 
@@ -21,6 +21,7 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
   const [managerPinError, setManagerPinError] = useState("");
   const [removeBalanceAdjustment, setRemoveBalanceAdjustment] = useState(false);
   const [payAmount, setPayAmount] = useState("");
+  const [copyStatus, setCopyStatus] = useState("");
 
   const namesListId = useId();
   const isManager = normalizeName(member?.Name) === "kalai";
@@ -87,11 +88,25 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
   }
 
   const payAmountNumber = getMoneyNumber(payAmount);
+  const paymentReceiver = getPaymentReceiver();
   const paymentLinks = createPaymentLinks({
     amount: payAmountNumber,
     payerName: member.Name,
   });
   const canPay = hasPaymentReceiver() && balanceAmount > 0 && payAmountNumber > 0;
+
+  async function handleCopyUpiId() {
+    if (!paymentReceiver.upiId) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(paymentReceiver.upiId);
+      setCopyStatus("Copied");
+    } catch {
+      setCopyStatus("Copy manually");
+    }
+  }
 
   function handleManagerPinSubmit(event) {
     event.preventDefault();
@@ -202,7 +217,7 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
           </label>
           {canPay ? (
             <a className="payment-button" href={paymentLinks.upi}>
-              Pay Rs {formatMoney(payAmountNumber)} via GPay
+              Pay Rs {formatMoney(payAmountNumber)} via UPI App
             </a>
           ) : hasPaymentReceiver() ? (
             <p className="payment-note">Enter amount to pay.</p>
@@ -210,6 +225,15 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
             <p className="payment-note">
               Add VITE_PAYMENT_UPI_ID in env to enable the UPI payment button.
             </p>
+          )}
+          {paymentReceiver.upiId && (
+            <div className="upi-id-card">
+              <span>UPI ID</span>
+              <strong>{paymentReceiver.upiId}</strong>
+              <button type="button" onClick={handleCopyUpiId}>
+                {copyStatus || "Copy"}
+              </button>
+            </div>
           )}
         </div>
       ) : (
@@ -316,6 +340,7 @@ function ExpensePanel({
 }
 
 export default ExpensePanel;
+
 
 
 

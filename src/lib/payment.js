@@ -24,6 +24,13 @@ export function hasPaymentReceiver() {
   return Boolean(PAYMENT_UPI_ID);
 }
 
+export function getPaymentReceiver() {
+  return {
+    upiId: PAYMENT_UPI_ID,
+    payeeName: PAYMENT_PAYEE_NAME,
+  };
+}
+
 export function createPaymentLinks({ amount, payerName }) {
   const params = createUpiParams({ amount, payerName });
 
@@ -32,6 +39,8 @@ export function createPaymentLinks({ amount, payerName }) {
     upi: `upi://pay?${params}`,
   };
 }
+
+
 
 
 

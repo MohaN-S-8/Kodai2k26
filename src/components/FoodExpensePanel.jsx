@@ -64,15 +64,22 @@ function mergeDefaultExpenses(expenses) {
 
   return [...defaultExpenses, ...extraExpenses];
 }
+function formatUpiAmount(amount) {
+  const number = Number(String(amount || "").replace(/,/g, ""));
+  return Number.isFinite(number) ? number.toFixed(2) : "";
+}
+
 function buildUpiLink({ name, amount }) {
-  if (!PAYMENT_UPI_ID || amount <= 0) {
+  const upiAmount = formatUpiAmount(amount);
+
+  if (!PAYMENT_UPI_ID || amount <= 0 || !upiAmount) {
     return "";
   }
 
   const params = new URLSearchParams({
     pa: PAYMENT_UPI_ID,
     pn: PAYMENT_PAYEE_NAME,
-    am: String(amount),
+    am: upiAmount,
     cu: "INR",
     tn: `Food expense split from ${name}`,
   });
@@ -391,3 +398,5 @@ function FoodExpensePanel({ memberRows, onClose, onToast }) {
 }
 
 export default FoodExpensePanel;
+
+

@@ -663,32 +663,11 @@ tbody tr {
   line-height: 1.35;
 }
 
-.partial-payment-box {
+.payment-action-box {
   display: grid;
-  grid-template-columns: minmax(150px, 190px) auto;
   align-items: end;
   gap: 10px;
   margin-left: auto;
-}
-
-.partial-payment-box label {
-  display: grid;
-  gap: 6px;
-  color: #0e1013;
-  font-size: 0.78rem;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.partial-payment-box input {
-  width: 100%;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #111827;
-  padding: 11px 12px;
-  font-size: 0.95rem;
-  font-weight: 800;
 }
 
 .upi-id-card {
@@ -1660,9 +1639,7 @@ tbody tr.is-paid td,
     align-items: stretch;
     flex-direction: column;
   }
-
-  .partial-payment-box {
-    grid-template-columns: 1fr;
+  .payment-action-box {
     margin-left: 0;
   }
 
@@ -2310,5 +2287,6 @@ tbody tr.has-balance-without-food td {
   height: 18px;
   accent-color: #111827;
 }
+
 
 

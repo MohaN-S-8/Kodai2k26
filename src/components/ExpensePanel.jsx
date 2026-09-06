@@ -20,7 +20,6 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
   const [managerPin, setManagerPin] = useState("");
   const [managerPinError, setManagerPinError] = useState("");
   const [removeBalanceAdjustment, setRemoveBalanceAdjustment] = useState(false);
-  const [payAmount, setPayAmount] = useState("");
   const [copyStatus, setCopyStatus] = useState("");
 
   const namesListId = useId();
@@ -44,11 +43,6 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
       setRemoveBalanceAdjustment(false);
     }
   }, [managerTarget]);
-
-
-  useEffect(() => {
-    setPayAmount(balanceAmount > 0 ? String(balanceAmount) : "");
-  }, [balanceAmount, member?.Name]);
 
   if (!member) {
     return (
@@ -87,13 +81,12 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
     );
   }
 
-  const payAmountNumber = getMoneyNumber(payAmount);
   const paymentReceiver = getPaymentReceiver();
   const paymentLinks = createPaymentLinks({
-    amount: payAmountNumber,
+    amount: balanceAmount,
     payerName: member.Name,
   });
-  const canPay = hasPaymentReceiver() && balanceAmount > 0 && payAmountNumber > 0;
+  const canPay = hasPaymentReceiver() && balanceAmount > 0;
 
   async function handleCopyUpiId() {
     if (!paymentReceiver.upiId) {
@@ -204,23 +197,11 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
       )}
 
       {balanceAmount > 0 ? (
-        <div className="partial-payment-box">
-          <label>
-            Pay amount
-            <input
-              type="text"
-              inputMode="decimal"
-              value={payAmount}
-              onChange={(event) => setPayAmount(event.target.value)}
-              placeholder={String(balanceAmount)}
-            />
-          </label>
+        <div className="payment-action-box">
           {canPay ? (
             <a className="payment-button" href={paymentLinks.upi}>
-              Pay Rs {formatMoney(payAmountNumber)} via UPI App
+              Pay Rs {formatMoney(balanceAmount)} via UPI App
             </a>
-          ) : hasPaymentReceiver() ? (
-            <p className="payment-note">Enter amount to pay.</p>
           ) : (
             <p className="payment-note">
               Add VITE_PAYMENT_UPI_ID in env to enable the UPI payment button.
@@ -340,6 +321,7 @@ function ExpensePanel({
 }
 
 export default ExpensePanel;
+
 
 
 

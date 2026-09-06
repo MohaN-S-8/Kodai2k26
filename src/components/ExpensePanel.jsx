@@ -158,7 +158,7 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
             Total given
             <input
               type="text"
-              inputMode="decimal"
+              inputMode="text"
               value={managerAmount}
               onChange={(event) => setManagerAmount(event.target.value)}
               placeholder="Payment amount or 800+3320"
@@ -182,12 +182,12 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
       )}
 
       {canPay ? (
-        <a className="payment-button" href={paymentLinks.gpay}>
+        <a className="payment-button" href={paymentLinks.upi}>
           Pay Rs {formatMoney(balanceAmount)} via GPay
         </a>
       ) : (
         <p className="payment-note">
-          Add VITE_PAYMENT_UPI_ID in env to enable the GPay payment button.
+          Add VITE_PAYMENT_UPI_ID in env to enable the UPI payment button.
         </p>
       )}
     </section>
@@ -291,5 +291,7 @@ function ExpensePanel({
 }
 
 export default ExpensePanel;
+
+
 
 

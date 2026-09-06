@@ -185,10 +185,12 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
         <a className="payment-button" href={paymentLinks.upi}>
           Pay Rs {formatMoney(balanceAmount)} via GPay
         </a>
-      ) : (
+      ) : balanceAmount > 0 ? (
         <p className="payment-note">
           Add VITE_PAYMENT_UPI_ID in env to enable the UPI payment button.
         </p>
+      ) : (
+        <p className="payment-note">Payment completed</p>
       )}
     </section>
   );
@@ -291,6 +293,7 @@ function ExpensePanel({
 }
 
 export default ExpensePanel;
+
 
 
 

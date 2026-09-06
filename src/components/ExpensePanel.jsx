@@ -9,6 +9,9 @@ const EXPENSE_UPDATE_PIN = import.meta.env.VITE_TRIP_UPDATE_PIN || "";
 function isFullyPaid(member) {
   return getMoneyNumber(member?.[BALANCE_COLUMN]) <= 0;
 }
+function hasBalanceFormulaAdjustment(member) {
+  return Boolean(member?.__hasBalanceAdjustment);
+}
 
 function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows, nameError, names = [], onPaymentManagerUnlock, onSelectMember, onUpdatePayment, paymentManagerPin }) {
   const [name, setName] = useState("");
@@ -248,7 +251,7 @@ function ExpensePanel({
             <tbody>
               {memberRows.map((row, rowIndex) => (
                 <tr
-                  className={isFullyPaid(row) ? "is-paid" : ""}
+                  className={`${isFullyPaid(row) ? "is-paid" : ""} ${hasBalanceFormulaAdjustment(row) ? "has-balance-without-food" : ""}`.trim()}
                   key={`${row.No}-${row.Name}-${rowIndex}`}
                 >
                   {visibleColumns.map((column) => (

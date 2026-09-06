@@ -2214,3 +2214,16 @@ tbody tr.is-paid td,
     text-align: left;
   }
 }
+/* Highlight rows with Balance Without Food amount */
+tbody tr.has-balance-without-food {
+  background: rgba(255, 237, 213, 0.94) !important;
+}
+
+tbody tr.has-balance-without-food:hover {
+  background: rgba(254, 215, 170, 0.98) !important;
+}
+
+tbody tr.has-balance-without-food td {
+  color: #7c2d12;
+  font-weight: 900;
+}

@@ -80,19 +80,26 @@ function cleanHeader(value, index) {
   return String(value || "").replace(/\s+/g, " ").trim() || `Column ${index + 1}`;
 }
 
-function recordsToData(records) {
+function hasAddedFormulaAmount(formula) {
+  return /^=/.test(String(formula || "").trim()) && /\+\s*\d+(?:\.\d+)?\s*$/.test(String(formula || ""));
+}
+
+function recordsToData(records, formulaRecords = []) {
   if (records.length === 0) {
     return { columns: [], rows: [] };
   }
 
   const columns = records[0].map(cleanHeader);
+    const balanceColumnIndex = columns.indexOf("Balance Amount From per Person Without food");
   const rows = records.slice(1).map((values, rowIndex) => {
     const row = columns.reduce((result, column, index) => {
       result[column] = values[index] || "";
       return result;
     }, {});
+    const balanceFormula = formulaRecords[rowIndex + 1]?.[balanceColumnIndex] || "";
 
     row.__rowNumber = rowIndex + 2;
+    row.__hasBalanceAdjustment = balanceColumnIndex >= 0 && hasAddedFormulaAmount(balanceFormula);
     return row;
   });
 
@@ -219,7 +226,8 @@ async function readFromSheetsApi() {
   const sheetTitle = await getSheetTitle();
   const range = `${quoteSheetName(sheetTitle)}!A:Z`;
   const data = await sheetsRequest(`/values/${encodeURIComponent(range)}`);
-  return recordsToData(data.values || []);
+  const formulaData = await sheetsRequest(`/values/${encodeURIComponent(range)}?valueRenderOption=FORMULA`);
+  return recordsToData(data.values || [], formulaData.values || []);
 }
 
 async function readFromCsv() {

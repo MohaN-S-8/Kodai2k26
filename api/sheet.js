@@ -98,9 +98,18 @@ function parseAmountExpression(value) {
   return Number.isFinite(total) ? String(total) : "";
 }
 
-function removeAddedFormulaAmount(formula) {
-  const cleanFormula = String(formula || "").trim();
-  return hasAddedFormulaAmount(cleanFormula) ? cleanFormula.replace(/\+\s*\d+(?:\.\d+)?\s*$/, "") : cleanFormula;
+function getBooleanCell(value) {
+  const cleanValue = String(value || "").trim().toLowerCase();
+
+  if (["true", "yes", "y", "1"].includes(cleanValue)) {
+    return true;
+  }
+
+  if (["false", "no", "n", "0"].includes(cleanValue)) {
+    return false;
+  }
+
+  return null;
 }
 
 function recordsToData(records, formulaRecords = []) {
@@ -110,15 +119,17 @@ function recordsToData(records, formulaRecords = []) {
 
   const columns = records[0].map(cleanHeader);
   const balanceColumnIndex = columns.indexOf("Balance Amount From per Person Without food");
+  const highlightColumnIndex = columns.indexOf("Highlight");
   const rows = records.slice(1).map((values, rowIndex) => {
     const row = columns.reduce((result, column, index) => {
       result[column] = values[index] || "";
       return result;
     }, {});
     const balanceFormula = formulaRecords[rowIndex + 1]?.[balanceColumnIndex] || "";
+    const highlightValue = highlightColumnIndex >= 0 ? getBooleanCell(values[highlightColumnIndex]) : null;
 
     row.__rowNumber = rowIndex + 2;
-    row.__hasBalanceAdjustment = balanceColumnIndex >= 0 && hasAddedFormulaAmount(balanceFormula);
+    row.__hasBalanceAdjustment = highlightValue ?? (balanceColumnIndex >= 0 && hasAddedFormulaAmount(balanceFormula));
     return row;
   });
 
@@ -301,7 +312,7 @@ async function updateTotalGiven({ name, totalGiven, removeBalanceAdjustment = fa
   const columns = (values[0] || []).map(cleanHeader);
   const nameIndex = columns.indexOf("Name");
   const totalGivenIndex = columns.indexOf("Total given");
-  const balanceIndex = columns.indexOf("Balance Amount From per Person Without food");
+  const highlightIndex = columns.indexOf("Highlight");
 
   if (nameIndex === -1 || totalGivenIndex === -1) {
     throw new Error("Sheet must contain Name and Total given columns");
@@ -316,10 +327,6 @@ async function updateTotalGiven({ name, totalGiven, removeBalanceAdjustment = fa
     throw new Error("Name not found in Google Sheet");
   }
 
-  if (removeBalanceAdjustment && balanceIndex === -1) {
-    throw new Error("Sheet must contain Balance Without Food column");
-  }
-
   const updates = [
     {
       range: `${quoteSheetName(sheetTitle)}!${columnLetter(totalGivenIndex)}${targetIndex + 1}`,
@@ -328,14 +335,19 @@ async function updateTotalGiven({ name, totalGiven, removeBalanceAdjustment = fa
   ];
 
   if (removeBalanceAdjustment) {
-    const formulaRange = `${quoteSheetName(sheetTitle)}!${columnLetter(balanceIndex)}${targetIndex + 1}`;
-    const formulaData = await sheetsRequest(`/values/${encodeURIComponent(formulaRange)}?valueRenderOption=FORMULA`);
-    const currentFormula = formulaData.values?.[0]?.[0] || "";
-    const nextFormula = removeAddedFormulaAmount(currentFormula);
+    const targetHighlightIndex = highlightIndex === -1 ? columns.length : highlightIndex;
 
-    if (nextFormula && nextFormula !== currentFormula) {
-      updates.push({ range: formulaRange, values: [[nextFormula]] });
+    if (highlightIndex === -1) {
+      updates.push({
+        range: `${quoteSheetName(sheetTitle)}!${columnLetter(targetHighlightIndex)}1`,
+        values: [["Highlight"]],
+      });
     }
+
+    updates.push({
+      range: `${quoteSheetName(sheetTitle)}!${columnLetter(targetHighlightIndex)}${targetIndex + 1}`,
+      values: [["FALSE"]],
+    });
   }
 
   await sheetsRequest(`/values:batchUpdate?valueInputOption=USER_ENTERED`, {
@@ -391,6 +403,8 @@ export default async function handler(request, response) {
     });
   }
 }
+
+
 
 
 

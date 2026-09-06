@@ -171,7 +171,7 @@ function PaymentCard({ error, isManagerUnlocked, isUpdating, member, memberRows,
                 checked={removeBalanceAdjustment}
                 onChange={(event) => setRemoveBalanceAdjustment(event.target.checked)}
               />
-              Remove balance highlight
+              Turn off balance highlight
             </label>
           )}
           {error && <p className="payment-error">{error}</p>}
@@ -291,4 +291,5 @@ function ExpensePanel({
 }
 
 export default ExpensePanel;
+
 
